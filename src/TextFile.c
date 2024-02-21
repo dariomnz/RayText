@@ -381,13 +381,20 @@ void TextFile_Draw()
 {
     if (editor.editor_state != STATE_TEXTFILE && editor.editor_state != STATE_COMMAND)
         return;
-    size_t i;
-    for (i = 0; i < editor.currentTextFile.n_lines; i++)
+
+    int plus_minus_lines = (editor.screenHeight / editor.camera.zoom) / editor.font_size / 2;
+    int current_line = editor.currentTextFile.cursor.line_num;
+    int i;
+    for (i = current_line - plus_minus_lines; i < current_line + plus_minus_lines; i++)
     {
+        if (i < 0)
+            continue;
+        if (i >= editor.currentTextFile.n_lines)
+            break;
         // Draw text
         DrawTextEx(editor.font, editor.currentTextFile.lines[i]->data, (Vector2){0, editor.font_size * i}, editor.font_size, editor.font_spacing, WHITE);
         // Draw line number
-        sprintf(str_line_number, "%ld ", i + 1);
+        sprintf(str_line_number, "%d ", i + 1);
         str_line_number_size = MeasureTextEx(editor.font, str_line_number, editor.font_size, editor.font_spacing);
         DrawTextEx(editor.font, str_line_number, (Vector2){-str_line_number_size.x, editor.font_size * i}, editor.font_size, editor.font_spacing, GRAY);
     }
