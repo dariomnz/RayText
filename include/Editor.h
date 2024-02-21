@@ -1,12 +1,14 @@
 #ifndef Editor_H
 #define Editor_H
 
-#include "raylib.h"
+struct Editor;
+typedef struct Editor Editor;
+#include "Common.h"
 #include "TextFile.h"
+#include "Command.h"
+#include "Directory.h"
 
-#include <dirent.h>
-
-typedef struct Editor
+struct Editor
 {
     bool initialized;
     int screenWidth;
@@ -19,11 +21,18 @@ typedef struct Editor
     int font_spacing;
     Camera2D camera;
     Vector2 cursor_pos;
-} Editor;
 
-void InitializeEditor();
+    KeyboardKey key_pressed;
+    char char_pressed;
 
-void LogicEditor();
-void DrawEditor();
+    bool the_end;
+};
+
+void Editor_Init();
+
+void Editor_Logic();
+void Editor_Draw();
+
+void Editor_Close();
 
 #endif // Editor_H

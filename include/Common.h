@@ -1,7 +1,13 @@
 #ifndef Common_H
 #define Common_H
 
+#include <stdio.h>
+#include <dirent.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "raylib.h"
+#include "rlgl.h"
 #include "raymath.h"
 
 #define STR_MAX_LEN 64
@@ -18,6 +24,6 @@
 int Vector2EqualsEpsilon(Vector2 p, Vector2 q, float epsilon);
 
 void DrawRectangleCenter(int posX, int posY, int width, int height, Color color);
-
 void DrawTextExCenter(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint);
+
 #endif // Common_H

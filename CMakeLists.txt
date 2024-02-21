@@ -14,14 +14,12 @@ include_directories(
 )
 file(GLOB all_SRCS
         "${PROJECT_SOURCE_DIR}/include/*.h"
-		"${PROJECT_SOURCE_DIR}/src/*.c"
+	"${PROJECT_SOURCE_DIR}/src/*.c"
         )
 
 include_directories(${RAYLIB_DIR}/include)
 find_library(RAYLIB_LIBRARY raylib HINTS ${RAYLIB_DIR}/lib)
 
 add_executable(${PROJECT_NAME} ${all_SRCS})
-# add_executable(${PROJECT_NAME} src/main.c)
-# target_sources(${PROJECT_NAME} PUBLIC src)
 
 target_link_libraries(${PROJECT_NAME} ${RAYLIB_LIBRARY} m GL pthread dl rt X11)

@@ -1,15 +1,7 @@
 #ifndef TextFile_H
 #define TextFile_H
 
-#include "raylib.h"
-#include "rlgl.h"
-#include "raymath.h"
-
 #include "Common.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 typedef struct Line
 {
@@ -33,27 +25,23 @@ typedef struct TextFile
     char name[256];
 } TextFile;
 
+#include "Editor.h"
+
 size_t GetLineNumber(const char *file_name);
 
-TextFile LoadTextFile(const char *file_name);
-TextFile LoadEmptyTextFile();
+TextFile TextFile_Load(const char *file_name);
+TextFile TextFile_LoadEmpty();
+void TextFile_Free();
+void TextFile_Save();
 
-void SaveTextFile(TextFile textFile);
+void TextFile_Print();
 
-void FreeTextFile(TextFile textFile);
+void TextFile_InsertChar();
+void TextFile_RemoveChar();
+void TextFile_InsertNewLine();
+void TextFile_RemovePreLine();
 
-void PrintTextFile(TextFile textFile);
-
-void InsertChar(TextFile *textFile, char c);
-
-void InsertNewLine(TextFile *textFile);
-
-void RemovePreLine(TextFile *textFile);
-
-void RemoveChar(TextFile *textFile);
-
-void MoveCursor(TextFile *textFile, int key_press);
-
-Vector2 GetCursorPosition(TextFile textFile);
+void TextFile_MoveCursor();
+Vector2 TextFile_GetCursorPosition();
 
 #endif // TextFile_H

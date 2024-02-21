@@ -1,5 +1,7 @@
 #include "TextFile.h"
 
+extern Editor editor;
+
 size_t GetLineNumber(const char *file_name)
 {
     FILE *file;
@@ -22,7 +24,7 @@ size_t GetLineNumber(const char *file_name)
     return line_count + 1;
 }
 
-TextFile LoadTextFile(const char *file_name)
+TextFile TextFile_Load(const char *file_name)
 {
     TextFile textFile;
     FILE *file;
@@ -74,7 +76,7 @@ TextFile LoadTextFile(const char *file_name)
     return textFile;
 }
 
-TextFile LoadEmptyTextFile()
+TextFile TextFile_LoadEmpty()
 {
     TextFile textFile;
     size_t line_number = 1;
@@ -90,7 +92,7 @@ TextFile LoadEmptyTextFile()
     for (size_t i = 0; i < line_number; i++)
     {
         textFile.lines[i] = (Line *)malloc(sizeof(Line));
-        
+
         textFile.lines[i]->data = malloc(1);
         textFile.lines[i]->data[0] = '\0';
         textFile.lines[i]->size = 1;
@@ -106,51 +108,55 @@ TextFile LoadEmptyTextFile()
     return textFile;
 }
 
-void SaveTextFile(TextFile textFile)
+void TextFile_Save()
 {
-    DEBUG("Saving: %s", textFile.name);
+    TextFile *textFile = &editor.currentTextFile;
+    DEBUG("Saving: %s", textFile->name);
     FILE *file;
     // file = fopen("./input2.txt", "w");
-    file = fopen(textFile.name, "w");
+    file = fopen(textFile->name, "w");
     if (file == NULL)
     {
-        DEBUG("Error: opening the file %s", textFile.name);
+        DEBUG("Error: opening the file %s", textFile->name);
         return;
     }
 
-    for (size_t i = 0; i < textFile.n_lines; i++)
+    for (size_t i = 0; i < textFile->n_lines; i++)
     {
-        fwrite(textFile.lines[i]->data, textFile.lines[i]->str_size, 1, file);
+        fwrite(textFile->lines[i]->data, textFile->lines[i]->str_size, 1, file);
     }
 
     fclose(file);
 }
 
-void FreeTextFile(TextFile textFile)
+void TextFile_Free()
 {
-    for (size_t i = 0; i < textFile.n_lines; i++)
+    TextFile *textFile = &editor.currentTextFile;
+    for (size_t i = 0; i < textFile->n_lines; i++)
     {
-        free(textFile.lines[i]->data);
-        free(textFile.lines[i]);
+        free(textFile->lines[i]->data);
+        free(textFile->lines[i]);
     }
 
-    free(textFile.lines);
+    free(textFile->lines);
 }
 
-void PrintTextFile(TextFile textFile)
+void TextFile_Print()
 {
-    printf("--------File \"%s\"--------\n", textFile.name);
-    for (size_t i = 0; i < textFile.n_lines; i++)
+    TextFile *textFile = &editor.currentTextFile;
+    printf("--------File \"%s\"--------\n", textFile->name);
+    for (size_t i = 0; i < textFile->n_lines; i++)
     {
-        printf("%s", textFile.lines[i]->data);
-        if (textFile.lines[i]->data[0] == '\0')
+        printf("%s", textFile->lines[i]->data);
+        if (textFile->lines[i]->data[0] == '\0')
             printf("\n");
     }
-    printf("------End file \"%s\"------\n", textFile.name);
+    printf("------End file \"%s\"------\n", textFile->name);
 }
 
-void InsertChar(TextFile *textFile, char c)
+void TextFile_InsertChar()
 {
+    TextFile *textFile = &editor.currentTextFile;
     size_t len = textFile->cursor.line->size;
     size_t lenstr = strlen(textFile->cursor.line->data);
     size_t cursor_pos = textFile->cursor.position;
@@ -171,13 +177,14 @@ void InsertChar(TextFile *textFile, char c)
     }
 
     memmove(textFile->cursor.line->data + cursor_pos + 1, textFile->cursor.line->data + cursor_pos, (len - cursor_pos) * sizeof(char));
-    textFile->cursor.line->data[cursor_pos] = c;
+    textFile->cursor.line->data[cursor_pos] = editor.char_pressed;
     textFile->cursor.position++;
     textFile->cursor.line->str_size++;
 }
 
-void InsertNewLine(TextFile *textFile)
+void TextFile_InsertNewLine()
 {
+    TextFile *textFile = &editor.currentTextFile;
     size_t new_line_pos = textFile->cursor.line_num + 1;
     Line **new_lines = (Line **)realloc(textFile->lines, sizeof(Line *) * (textFile->n_lines + 1));
     if (new_lines == NULL)
@@ -222,8 +229,9 @@ void InsertNewLine(TextFile *textFile)
     textFile->n_lines++;
 }
 
-void RemovePreLine(TextFile *textFile)
+void TextFile_RemovePreLine()
 {
+    TextFile *textFile = &editor.currentTextFile;
     if (textFile->cursor.line_num == 0)
         return;
 
@@ -255,13 +263,14 @@ void RemovePreLine(TextFile *textFile)
     textFile->lines = (Line **)realloc(textFile->lines, sizeof(Line *) * textFile->n_lines);
 }
 
-void RemoveChar(TextFile *textFile)
-{   
+void TextFile_RemoveChar()
+{
+    TextFile *textFile = &editor.currentTextFile;
     size_t len = textFile->cursor.line->size;
     size_t cursor_pos = textFile->cursor.position;
     if (cursor_pos == 0)
     {
-        RemovePreLine(textFile);
+        TextFile_RemovePreLine(textFile);
         return;
     }
 
@@ -270,16 +279,17 @@ void RemoveChar(TextFile *textFile)
     textFile->cursor.line->str_size--;
 }
 
-void MoveCursor(TextFile *textFile, int key_press)
+void TextFile_MoveCursor()
 {
-    switch (key_press)
+    TextFile *textFile = &editor.currentTextFile;
+    switch (editor.key_pressed)
     {
     case KEY_RIGHT:
 
         textFile->cursor.position++;
         if (textFile->cursor.position + 1 > textFile->cursor.line->str_size)
         {
-            key_press = KEY_DOWN;
+            editor.key_pressed = KEY_DOWN;
             if (textFile->cursor.line_num != textFile->n_lines - 1)
                 textFile->cursor.position = 0;
         }
@@ -290,7 +300,7 @@ void MoveCursor(TextFile *textFile, int key_press)
             textFile->cursor.position--;
         else
         {
-            key_press = KEY_UP;
+            editor.key_pressed = KEY_UP;
             if (textFile->cursor.line_num != 0)
                 textFile->cursor.position = __SIZE_MAX__ - 1;
         }
@@ -299,7 +309,7 @@ void MoveCursor(TextFile *textFile, int key_press)
     default:
         break;
     }
-    switch (key_press)
+    switch (editor.key_pressed)
     {
     case KEY_UP:
         if (textFile->cursor.line_num != 0)
@@ -327,4 +337,21 @@ void MoveCursor(TextFile *textFile, int key_press)
             textFile->cursor.position = textFile->cursor.line->str_size;
 
     // DEBUG("cursor_pos %ld str_size %ld line %ld char %c", textFile->cursor.position, textFile->cursor.line->str_size, textFile->cursor.line_num, textFile->cursor.line->data[textFile->cursor.line->str_size - 1]);
+}
+
+Vector2 TextFile_GetCursorPosition()
+{
+    TextFile *textFile = &editor.currentTextFile;
+    size_t cursor_pos = textFile->cursor.position;
+    char cursor_char = textFile->cursor.line->data[cursor_pos];
+    textFile->cursor.line->data[cursor_pos] = '\0';
+    Vector2 cursor_vec_pos = MeasureTextEx(editor.font, textFile->cursor.line->data, editor.font_size, editor.font_spacing);
+    textFile->cursor.line->data[cursor_pos] = cursor_char;
+    cursor_vec_pos.y = editor.font_size * textFile->cursor.line_num;
+    return cursor_vec_pos;
+}
+
+void TextFile_Draw()
+{
+    
 }
