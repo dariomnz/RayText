@@ -53,3 +53,4 @@ dkms.conf
 
 build/
 main
+!raylib-5.0_linux_amd64/lib/*
