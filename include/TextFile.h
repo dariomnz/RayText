@@ -44,4 +44,7 @@ void TextFile_RemovePreLine();
 void TextFile_MoveCursor();
 Vector2 TextFile_GetCursorPosition();
 
+void TextFile_Logic();
+void TextFile_Draw();
+
 #endif // TextFile_H

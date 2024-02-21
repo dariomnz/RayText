@@ -3,10 +3,18 @@
 
 struct Editor;
 typedef struct Editor Editor;
+
 #include "Common.h"
 #include "TextFile.h"
 #include "Command.h"
 #include "Directory.h"
+
+typedef enum
+{
+    STATE_TEXTFILE = 0,
+    STATE_COMMAND = 1,
+    STATE_DIRECTORY = 2
+} Editor_state;
 
 struct Editor
 {
@@ -14,8 +22,8 @@ struct Editor
     int screenWidth;
     int screenHeight;
     TextFile currentTextFile;
-    char currentCommand[STR_MAX_LEN];
-    bool is_commands_showing;
+    char currentCommand[MAX_COMMAND_LEN];
+    Directory currentDirectory;
     Font font;
     int font_size;
     int font_spacing;
@@ -25,6 +33,7 @@ struct Editor
     KeyboardKey key_pressed;
     char char_pressed;
 
+    Editor_state editor_state;
     bool the_end;
 };
 

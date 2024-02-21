@@ -2,15 +2,17 @@
 #define Common_H
 
 #include <stdio.h>
-#include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include <unistd.h>
 
 #include "raylib.h"
 #include "rlgl.h"
 #include "raymath.h"
 
-#define STR_MAX_LEN 64
+#define MAX_COMMAND_LEN 64
+#define MAX_PATH 1024
 
 #define DEBUG(fmt, ...) fprintf(stderr, "[%s:%d] %s(): " fmt "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__)
 

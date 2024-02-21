@@ -32,7 +32,7 @@ TextFile TextFile_Load(const char *file_name)
     size_t line_len = 0;
     char *line = NULL;
     size_t line_size;
-
+    DEBUG("Opening: %s", file_name);
     file = fopen(file_name, "r");
     if (file == NULL)
     {
@@ -351,7 +351,49 @@ Vector2 TextFile_GetCursorPosition()
     return cursor_vec_pos;
 }
 
+void TextFile_Logic()
+{
+    if (editor.editor_state != STATE_TEXTFILE)
+        return;
+
+    TextFile_MoveCursor(&editor.currentTextFile);
+    editor.cursor_pos = TextFile_GetCursorPosition(editor.currentTextFile);
+
+    if (editor.key_pressed == KEY_BACKSPACE)
+        TextFile_RemoveChar(&editor.currentTextFile);
+
+    if (editor.char_pressed != 0)
+        TextFile_InsertChar(&editor.currentTextFile, editor.char_pressed);
+
+    if (editor.key_pressed == KEY_ENTER)
+        TextFile_InsertNewLine(&editor.currentTextFile);
+
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
+    {
+        TextFile_Save(editor.currentTextFile);
+    }
+}
+
+int final_num_pos = 0;
+char str_line_number[10];
+Vector2 str_line_number_size;
 void TextFile_Draw()
 {
-    
+    if (editor.editor_state != STATE_TEXTFILE && editor.editor_state != STATE_COMMAND)
+        return;
+    size_t i;
+    for (i = 0; i < editor.currentTextFile.n_lines; i++)
+    {
+        // Draw text
+        DrawTextEx(editor.font, editor.currentTextFile.lines[i]->data, (Vector2){0, editor.font_size * i}, editor.font_size, editor.font_spacing, WHITE);
+        // Draw line number
+        sprintf(str_line_number, "%ld ", i + 1);
+        str_line_number_size = MeasureTextEx(editor.font, str_line_number, editor.font_size, editor.font_spacing);
+        DrawTextEx(editor.font, str_line_number, (Vector2){-str_line_number_size.x, editor.font_size * i}, editor.font_size, editor.font_spacing, GRAY);
+    }
+    // Draw line separator numbers
+    final_num_pos = editor.font_size * i;
+    DrawLineEx((Vector2){-4, 0}, (Vector2){-4, final_num_pos}, 1, GRAY);
+    // Draw cursor
+    DrawRectangleV(editor.cursor_pos, (Vector2){2, editor.font_size}, WHITE);
 }
