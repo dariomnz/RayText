@@ -74,6 +74,38 @@ TextFile LoadTextFile(const char *file_name)
     return textFile;
 }
 
+TextFile LoadEmptyTextFile()
+{
+    TextFile textFile;
+    size_t line_number = 1;
+    size_t line_len = 0;
+    char *line = NULL;
+    size_t line_size;
+
+    sprintf(textFile.name, "empty.txt");
+
+    textFile.n_lines = line_number;
+    textFile.lines = (Line **)malloc(sizeof(Line *) * line_number);
+
+    for (size_t i = 0; i < line_number; i++)
+    {
+        textFile.lines[i] = (Line *)malloc(sizeof(Line));
+        
+        textFile.lines[i]->data = malloc(1);
+        textFile.lines[i]->data[0] = '\0';
+        textFile.lines[i]->size = 1;
+        textFile.lines[i]->str_size = strlen(textFile.lines[i]->data);
+        // DEBUG("Size: %ld line: %s", textFile.lines[i]->size, textFile.lines[i]->data);
+    }
+    free(line);
+
+    textFile.cursor.position = 0;
+    textFile.cursor.line = textFile.lines[0];
+    textFile.cursor.line_num = 0;
+
+    return textFile;
+}
+
 void SaveTextFile(TextFile textFile)
 {
     DEBUG("Saving: %s", textFile.name);
@@ -224,7 +256,7 @@ void RemovePreLine(TextFile *textFile)
 }
 
 void RemoveChar(TextFile *textFile)
-{
+{   
     size_t len = textFile->cursor.line->size;
     size_t cursor_pos = textFile->cursor.position;
     if (cursor_pos == 0)

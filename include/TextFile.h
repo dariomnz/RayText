@@ -36,6 +36,7 @@ typedef struct TextFile
 size_t GetLineNumber(const char *file_name);
 
 TextFile LoadTextFile(const char *file_name);
+TextFile LoadEmptyTextFile();
 
 void SaveTextFile(TextFile textFile);
 
