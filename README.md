@@ -6,6 +6,7 @@ RayText is a lightweight text editor implemented in C with Raylib.
 ```
 Key bindings:
     Ctrl + P                -> Open commands
+    Ctrl + B                -> Toggle file explorer
     Ctrl + S                -> Save the file
     Esc                     -> Exit the editor
 

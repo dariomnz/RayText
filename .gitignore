@@ -55,3 +55,4 @@ dkms.conf
 build/
 RayText
 !raylib-5.0_linux_amd64/lib/*
+main

@@ -1,5 +1,12 @@
 #include "Common.h"
 
+int FloatEqualsEpsilon(float x, float y, float epsilon)
+{
+    int result = (fabsf(x - y)) <= (epsilon);
+
+    return result;
+}
+
 int Vector2EqualsEpsilon(Vector2 p, Vector2 q, float epsilon)
 {
     int result = ((fabsf(p.x - q.x)) <= (epsilon)) &&

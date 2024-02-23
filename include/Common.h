@@ -23,6 +23,7 @@
  */
 #define FOR_EACH(type, ptr, arr) for (type *ptr = arr; ptr < arr + sizeof(arr) / sizeof(arr[0]); ptr++)
 
+int FloatEqualsEpsilon(float x, float y, float epsilon);
 int Vector2EqualsEpsilon(Vector2 p, Vector2 q, float epsilon);
 
 void DrawRectangleCenter(int posX, int posY, int width, int height, Color color);

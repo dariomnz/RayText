@@ -17,13 +17,14 @@ void Editor_Init()
     editor.screenHeight = 450;
     InitWindow(editor.screenWidth, editor.screenHeight, "RayText");
 
-    editor.font = LoadFont("./fonts/Monaco.ttf");
-    SetTextureFilter(editor.font.texture, TEXTURE_FILTER_ANISOTROPIC_8X);
+    editor.font = LoadFontEx("./fonts/Monaco.ttf", 82, 0, 0);
+    SetTextureFilter(editor.font.texture, TEXTURE_FILTER_BILINEAR);
     editor.font_size = 20;
     editor.font_spacing = 0;
     editor.currentCommand[0] = '\0';
     editor.currentTextFile = TextFile_LoadEmpty();
 
+    editor.zoom = 1.0f;
     editor.camera.zoom = 1.0f;
     editor.camera.offset = (Vector2){editor.screenWidth / 2, editor.screenHeight / 2};
 
@@ -61,12 +62,16 @@ void Editor_Logic()
     {
         const float zoomIncrement = 0.125f;
 
-        editor.camera.zoom += (wheel * zoomIncrement);
-        if (editor.camera.zoom < zoomIncrement)
-            editor.camera.zoom = zoomIncrement;
+        editor.zoom += (wheel * zoomIncrement);
+        if (editor.zoom < zoomIncrement)
+            editor.zoom = zoomIncrement;
     }
+
     if (Vector2EqualsEpsilon(editor.cursor_pos, editor.camera.target, 0.1f) == 0)
         editor.camera.target = Vector2Lerp(editor.camera.target, editor.cursor_pos, 0.2f);
+
+    if (FloatEqualsEpsilon(editor.camera.zoom, editor.zoom, 0.01f) == 0)
+        editor.camera.zoom = Lerp(editor.camera.zoom, editor.zoom, 0.1f);
 }
 
 void Editor_Draw()

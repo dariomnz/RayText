@@ -28,6 +28,7 @@ struct Editor
     int font_size;
     int font_spacing;
     Camera2D camera;
+    float zoom;
     Vector2 cursor_pos;
 
     KeyboardKey key_pressed;

@@ -5,7 +5,7 @@
             "label": "C/C++: gcc build active file",
             "command": "/bin/bash",
             "args": [
-                "./build.sh",
+                "../debug.sh",
             ],
             "options": {
                 "cwd": "${fileDirname}"

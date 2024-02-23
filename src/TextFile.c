@@ -32,7 +32,7 @@ TextFile TextFile_Load(const char *file_name)
     size_t line_len = 0;
     char *line = NULL;
     size_t line_size;
-    DEBUG("Opening: %s", file_name);
+    DEBUG("Opening file: %s", file_name);
     file = fopen(file_name, "r");
     if (file == NULL)
     {
@@ -211,7 +211,7 @@ void TextFile_InsertNewLine()
     // Copy data
     memcpy(new_line->data, &textFile->cursor.line->data[textFile->cursor.position], new_line_size);
     // Move array by 1
-    memcpy(&textFile->lines[new_line_pos + 1], &textFile->lines[new_line_pos], (textFile->n_lines - new_line_pos) * sizeof(Line *));
+    memmove(&textFile->lines[new_line_pos + 1], &textFile->lines[new_line_pos], (textFile->n_lines - new_line_pos) * sizeof(Line *));
 
     textFile->lines[new_line_pos] = new_line;
 

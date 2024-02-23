@@ -64,6 +64,19 @@ Vector2 Directory_GetCursorPosition()
 
 void Directory_Logic()
 {
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_B))
+    {
+        if (editor.editor_state == STATE_DIRECTORY)
+        {
+            editor.editor_state = STATE_TEXTFILE;
+        }
+        else
+        {
+            editor.editor_state = STATE_DIRECTORY;
+            Directory_Load(".");
+        }
+    }
+
     if (editor.editor_state != STATE_DIRECTORY)
         return;
 
