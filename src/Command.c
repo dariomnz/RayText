@@ -94,10 +94,10 @@ void Command_Consume()
         if (*endptr == '\0')
         {
             DEBUG("go to line: %ld", val);
-            if (val - 1 < editor.currentTextFile.n_lines && val > 0)
+            if (val - 1 < editor.currentTextFile.count && val > 0)
             {
                 editor.currentTextFile.cursor.line_num = val - 1;
-                editor.currentTextFile.cursor.line = editor.currentTextFile.lines[val - 1];
+                editor.currentTextFile.cursor.line = editor.currentTextFile.items[val - 1];
                 editor.currentTextFile.cursor.position = 0;
             }
         }

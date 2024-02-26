@@ -5,9 +5,9 @@
 
 typedef struct Line
 {
-    char *data;      // Data of line
-    size_t size;     // Size of data
-    size_t str_size; // Size of line
+    char *items;     // Darray items
+    size_t count;    // Darray count
+    size_t capacity; // Darray capacity
 } Line;
 
 typedef struct Cursor
@@ -19,10 +19,12 @@ typedef struct Cursor
 
 typedef struct TextFile
 {
-    size_t n_lines; // Size of lines
-    Line **lines;   // Array of pointers to lines
+    Line **items;    // Darray of pointers to lines
+    size_t count;    // Darray count
+    size_t capacity; // Darray capacity
+
     Cursor cursor;  // Cursor
-    char name[256];
+    char name[256]; // Name of file
 } TextFile;
 
 #include "Editor.h"
