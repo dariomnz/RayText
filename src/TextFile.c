@@ -3,108 +3,32 @@
 
 extern Editor editor;
 
-size_t GetLineNumber(const char *file_name)
-{
-    FILE *file;
-    char ch;
-    size_t line_count = 0;
-
-    file = fopen(file_name, "r");
-    if (file == NULL)
-    {
-        DEBUG("Error: opening the file %s\n", file_name);
-        exit(1);
-    }
-
-    while ((ch = fgetc(file)) != EOF)
-        if (ch == '\n')
-            line_count++;
-
-    fclose(file);
-
-    return line_count + 1;
-}
-
 TextFile TextFile_Load(const char *file_name)
 {
-    // TextFile textFile;
-    // FILE *file;
-    // size_t line_number = GetLineNumber(file_name);
-    // size_t line_len = 0;
-    // char *line = NULL;
-    // size_t line_size;
-    // DEBUG("Opening file: %s", file_name);
-    // file = fopen(file_name, "r");
-    // if (file == NULL)
-    // {
-    //     DEBUG("Error: opening the file %s", file_name);
-    //     exit(1);
-    // }
-
-    // sprintf(textFile.name, "%s", file_name);
-
-    // textFile.n_lines = line_number;
-    // textFile.lines = (Line **)malloc(sizeof(Line *) * line_number);
-
-    // for (size_t i = 0; i < line_number; i++)
-    // {
-    //     textFile.lines[i] = (Line *)malloc(sizeof(Line));
-    //     line_size = getline(&line, &line_len, file);
-    //     if (line_size != -1)
-    //     {
-    //         textFile.lines[i]->items = malloc(sizeof(char) * line_size + 1);
-    //         memcpy(textFile.lines[i]->items, line, line_size);
-    //         textFile.lines[i]->items[line_size] = '\0';
-    //         textFile.lines[i]->capacity = line_size + 1;
-    //     }
-    //     else
-    //     {
-    //         textFile.lines[i]->items = malloc(1);
-    //         textFile.lines[i]->items[0] = '\0';
-    //         textFile.lines[i]->capacity = 1;
-    //     }
-
-    //     textFile.lines[i]->count = strlen(textFile.lines[i]->items);
-    //     // DEBUG("Size: %ld line: %s", textFile.lines[i]->capacity, textFile.lines[i]->items);
-    // }
-    // free(line);
-    // fclose(file);
-
-    // textFile.cursor.position = 0;
-    // textFile.cursor.line = textFile.lines[0];
-    // textFile.cursor.line_num = 0;
-
-    // return textFile;
-}
-
-TextFile TextFile_LoadEmpty()
-{
     TextFile textFile = {0};
-    // size_t line_number = 1;
-    // size_t line_len = 0;
-    // char *line = NULL;
-    // size_t line_size;
-
-    sprintf(textFile.name, "empty.txt");
-
-    // textFile.n_lines = 1;
-    Line new_line = {0};
-    darray_append(&new_line, '\0');
-    darray_append(&textFile, &new_line);
-
-    // textFile.lines = (Line **)malloc(sizeof(Line *));
-
-    // for (size_t i = 0; i < line_number; i++)
-    // {
-    // textFile.lines[i] = (Line *)malloc(sizeof(Line));
-    // darray_append(textFile.lines[i], '\0');
-    // textFile.lines[i]->items = malloc(1);
-    // textFile.lines[i]->items[0] = '\0';
-    // textFile.lines[i]->capacity = 1;
-    // textFile.lines[i]->count = strlen(textFile.lines[i]->items);
-    // DEBUG("Size: %ld line: %s", textFile.lines[i]->capacity, textFile.lines[i]->items);
-    // }
-    // free(line);
+    sprintf(textFile.name, "%s", file_name);
+    DEBUG("Opening file: %s", file_name);
+    char *data = LoadFileText(file_name);
+    size_t last_line = 0;
+    Line *new_line;
+    size_t i = 0;
+    printf("%s", data);
+    for (i = 0; i < strlen(data); i++)
+    {
+        if (data[i] == '\n')
+        {
+            new_line = malloc(sizeof(Line));
+            memset(new_line, 0, sizeof(Line));
+            DArray_append_many(new_line, &data[last_line], i - last_line);
+            DArray_append(&textFile, new_line);
+            last_line = i + 1;
+        }
+    }
+    new_line = malloc(sizeof(Line));
+    memset(new_line, 0, sizeof(Line));
+    DArray_append_many(new_line, &data[last_line], i - last_line);
+    DArray_append(&textFile, new_line);
+    UnloadFileText(data);
 
     textFile.cursor.position = 0;
     textFile.cursor.line = textFile.items[0];
@@ -113,25 +37,51 @@ TextFile TextFile_LoadEmpty()
     return textFile;
 }
 
+TextFile TextFile_LoadEmpty()
+{
+    TextFile textFile = {0};
+    sprintf(textFile.name, "empty.txt");
+
+    Line *new_line = malloc(sizeof(Line));
+    if (new_line == NULL)
+    {
+        DEBUG("Error: malloc of size: %ld", sizeof(Line));
+        return textFile;
+    }
+    memset(new_line, 0, sizeof(Line));
+
+    DArray_append(&textFile, new_line);
+
+    // Init Cursor
+    textFile.cursor.position = 0;
+    textFile.cursor.line = textFile.items[0];
+    textFile.cursor.line_num = 0;
+
+    return textFile;
+}
+
+DArray_char TextFile_to_string()
+{
+    TextFile *textFile = &editor.currentTextFile;
+    DArray_char data = {0};
+    for (size_t i = 0; i < textFile->count; i++)
+    {
+        DArray_append_many(&data, textFile->items[i]->items, textFile->items[i]->count);
+        if (i != textFile->count - 1)
+            DArray_append(&data, '\n');
+    }
+    return data;
+}
+
 void TextFile_Save()
 {
     TextFile *textFile = &editor.currentTextFile;
     DEBUG("Saving: %s", textFile->name);
-    FILE *file;
-    // file = fopen("./input2.txt", "w");
-    file = fopen(textFile->name, "w");
-    if (file == NULL)
-    {
-        DEBUG("Error: opening the file %s", textFile->name);
-        return;
-    }
+    DArray_char data = TextFile_to_string();
 
-    for (size_t i = 0; i < textFile->count; i++)
-    {
-        fwrite(textFile->items[i]->items, textFile->items[i]->count, 1, file);
-    }
+    SaveFileText(textFile->name, data.items);
 
-    fclose(file);
+    DArray_free(&data);
 }
 
 void TextFile_Free()
@@ -139,24 +89,21 @@ void TextFile_Free()
     TextFile *textFile = &editor.currentTextFile;
     for (size_t i = 0; i < textFile->count; i++)
     {
-        darray_free(textFile->items[i]);
-        free(textFile->items[i]->items);
+        DArray_free(textFile->items[i]);
         free(textFile->items[i]);
     }
 
-    free(textFile->items);
+    DArray_free(textFile);
 }
 
 void TextFile_Print()
 {
     TextFile *textFile = &editor.currentTextFile;
     printf("--------File \"%s\"--------\n", textFile->name);
-    for (size_t i = 0; i < textFile->count; i++)
-    {
-        printf("%s", textFile->items[i]->items);
-        if (textFile->items[i]->items[0] == '\0')
-            printf("\n");
-    }
+
+    DArray_char data = TextFile_to_string();
+    printf("%s\n", data.items);
+    DArray_free(&data);
     printf("------End file \"%s\"------\n", textFile->name);
 }
 
@@ -164,129 +111,93 @@ void TextFile_InsertChar()
 {
     TextFile *textFile = &editor.currentTextFile;
 
-    darray_insert(textFile->cursor.line, editor.char_pressed, textFile->cursor.position);
+    DArray_insert(textFile->cursor.line, editor.char_pressed, textFile->cursor.position);
     textFile->cursor.position++;
-
-    // size_t len = textFile->cursor.line->capacity;
-    // size_t lenstr = strlen(textFile->cursor.line->items);
-    // size_t cursor_pos = textFile->cursor.position;
-
-    // if (lenstr + 1 >= len)
-    // {
-    //     char *new_data = malloc((len + 128) * sizeof(char));
-    //     if (textFile->cursor.line->items == NULL)
-    //     {
-    //         DEBUG("Error: Memory allocation failed\n");
-    //         exit(1);
-    //     }
-    //     strcpy(new_data, textFile->cursor.line->items);
-    //     free(textFile->cursor.line->items);
-    //     textFile->cursor.line->items = new_data;
-    //     len += 64;
-    //     textFile->cursor.line->capacity = len;
-    // }
-
-    // memmove(textFile->cursor.line->items + cursor_pos + 1, textFile->cursor.line->items + cursor_pos, (len - cursor_pos) * sizeof(char));
-    // textFile->cursor.line->items[cursor_pos] = editor.char_pressed;
-    // textFile->cursor.position++;
-    // textFile->cursor.line->count++;
 }
 
 void TextFile_InsertNewLine()
 {
     TextFile *textFile = &editor.currentTextFile;
     size_t new_line_pos = textFile->cursor.line_num + 1;
-    Line **new_lines = (Line **)realloc(textFile->items, sizeof(Line *) * (textFile->count + 1));
-    if (new_lines == NULL)
-    {
-        DEBUG("Error: realloc of size: %ld", sizeof(Line *) * (textFile->count + 1));
-        return;
-    }
-    textFile->items = new_lines;
+    size_t new_line_chars = textFile->cursor.line->count - textFile->cursor.position;
 
-    Line *new_line = (Line *)malloc(sizeof(Line));
-    if (new_lines == NULL)
+    // Build new line
+    Line *new_line2 = malloc(sizeof(Line));
+    if (new_line2 == NULL)
     {
         DEBUG("Error: malloc of size: %ld", sizeof(Line));
         return;
     }
-    size_t new_line_size = textFile->cursor.line->capacity - textFile->cursor.position;
-    new_line->items = malloc(new_line_size);
-    if (new_lines == NULL)
-    {
-        DEBUG("Error: malloc of size: %ld", new_line_size);
-        return;
-    }
-    new_line->capacity = new_line_size;
-    // Copy data
-    memcpy(new_line->items, &textFile->cursor.line->items[textFile->cursor.position], new_line_size);
-    // Move array by 1
-    memmove(&textFile->items[new_line_pos + 1], &textFile->items[new_line_pos], (textFile->count - new_line_pos) * sizeof(Line *));
+    memset(new_line2, 0, sizeof(Line));
+    DArray_append_many(new_line2, &textFile->cursor.line->items[textFile->cursor.position], new_line_chars);
 
-    textFile->items[new_line_pos] = new_line;
+    DArray_insert(textFile, new_line2, new_line_pos);
 
     // Add return of line
-    textFile->cursor.line->items[textFile->cursor.position] = '\n';
-    textFile->cursor.line->items[textFile->cursor.position + 1] = '\0';
-    textFile->cursor.line->count = strlen(textFile->cursor.line->items);
+    if (textFile->cursor.position != textFile->cursor.line->count)
+        DArray_remove_from(textFile->cursor.line, textFile->cursor.position);
 
     // Update cursor
     textFile->cursor.line_num++;
     textFile->cursor.line = textFile->items[textFile->cursor.line_num];
-    textFile->cursor.line->count = strlen(textFile->cursor.line->items);
     textFile->cursor.position = 0;
-
-    textFile->count++;
 }
 
-void TextFile_RemovePreLine()
+void TextFile_RemoveLine_Left()
 {
     TextFile *textFile = &editor.currentTextFile;
     if (textFile->cursor.line_num == 0)
         return;
 
-    size_t new_line_size = textFile->items[textFile->cursor.line_num - 1]->capacity + textFile->items[textFile->cursor.line_num]->capacity;
+    size_t position_pre_line = textFile->items[textFile->cursor.line_num - 1]->count;
+    DArray_append_many(textFile->items[textFile->cursor.line_num - 1], textFile->cursor.line->items, textFile->cursor.line->count);
+    DArray_remove(textFile, textFile->cursor.line_num);
 
-    char *new_line_data = (char *)realloc(textFile->items[textFile->cursor.line_num - 1]->items, new_line_size);
-    if (new_line_data == NULL)
-    {
-        DEBUG("Error: realloc of size: %ld", new_line_size);
-        return;
-    }
-    textFile->items[textFile->cursor.line_num - 1]->items = new_line_data;
-    memcpy(&new_line_data[textFile->items[textFile->cursor.line_num - 1]->count - 1], textFile->items[textFile->cursor.line_num]->items, textFile->items[textFile->cursor.line_num]->count);
-
-    free(textFile->items[textFile->cursor.line_num]->items);
-    free(textFile->items[textFile->cursor.line_num]);
-
-    memcpy(&textFile->items[textFile->cursor.line_num], &textFile->items[textFile->cursor.line_num + 1], (textFile->count - textFile->cursor.line_num - 1) * sizeof(Line *));
-
+    // Update cursor
     textFile->cursor.line_num--;
     textFile->cursor.line = textFile->items[textFile->cursor.line_num];
-    textFile->cursor.position = textFile->cursor.line->count - 1;
-
-    textFile->cursor.line->count = strlen(textFile->cursor.line->items);
-    textFile->cursor.line->capacity = new_line_size;
-    textFile->cursor.line->items[textFile->cursor.line->count + 1] = '\0';
-
-    textFile->count--;
-    textFile->items = (Line **)realloc(textFile->items, sizeof(Line *) * textFile->count);
+    textFile->cursor.position = position_pre_line;
 }
 
-void TextFile_RemoveChar()
+void TextFile_RemoveLine_Right()
 {
     TextFile *textFile = &editor.currentTextFile;
-    size_t len = textFile->cursor.line->capacity;
+    if (textFile->cursor.line_num + 1 == textFile->count)
+        return;
+
+    DArray_append_many(textFile->cursor.line, textFile->items[textFile->cursor.line_num + 1]->items, textFile->items[textFile->cursor.line_num + 1]->count);
+    DArray_remove(textFile, textFile->cursor.line_num + 1);
+}
+
+void TextFile_RemoveChar_Left()
+{
+    TextFile *textFile = &editor.currentTextFile;
+
     size_t cursor_pos = textFile->cursor.position;
     if (cursor_pos == 0)
     {
-        TextFile_RemovePreLine(textFile);
+        TextFile_RemoveLine_Left(textFile);
         return;
     }
-    // darray_remove(textFile->cursor.line, textFile->cursor.position-1);
-    memmove(textFile->cursor.line->items + cursor_pos - 1, textFile->cursor.line->items + cursor_pos, (len - cursor_pos) * sizeof(char));
+
+    DArray_remove(textFile->cursor.line, cursor_pos - 1);
+
+    // Update cursor
     textFile->cursor.position--;
-    textFile->cursor.line->count--;
+}
+
+void TextFile_RemoveChar_Right()
+{
+    TextFile *textFile = &editor.currentTextFile;
+
+    size_t cursor_pos = textFile->cursor.position;
+    if (cursor_pos == textFile->cursor.line->count)
+    {
+        TextFile_RemoveLine_Right(textFile);
+        return;
+    }
+
+    DArray_remove(textFile->cursor.line, cursor_pos);
 }
 
 void TextFile_MoveCursor()
@@ -297,7 +208,7 @@ void TextFile_MoveCursor()
     case KEY_RIGHT:
 
         textFile->cursor.position++;
-        if (textFile->cursor.position + 1 > textFile->cursor.line->count)
+        if (textFile->cursor.position > textFile->cursor.line->count)
         {
             editor.key_pressed = KEY_DOWN;
             if (textFile->cursor.line_num != textFile->count - 1)
@@ -340,12 +251,9 @@ void TextFile_MoveCursor()
     default:
         break;
     }
-    if (textFile->cursor.position + 1 > textFile->cursor.line->count)
-        if (textFile->cursor.line->items[textFile->cursor.line->count - 1] == '\n')
-            textFile->cursor.position = textFile->cursor.line->count - 1;
-        else
-            textFile->cursor.position = textFile->cursor.line->count;
-
+    // Chech cursor position
+    if (textFile->cursor.position > textFile->cursor.line->count)
+        textFile->cursor.position = textFile->cursor.line->count;
     // DEBUG("cursor_pos %ld str_size %ld line %ld char %c", textFile->cursor.position, textFile->cursor.line->count, textFile->cursor.line_num, textFile->cursor.line->items[textFile->cursor.line->count - 1]);
 }
 
@@ -353,6 +261,10 @@ Vector2 TextFile_GetCursorPosition()
 {
     TextFile *textFile = &editor.currentTextFile;
     size_t cursor_pos = textFile->cursor.position;
+    if (textFile->cursor.line->count == 0)
+    {
+        return (Vector2){0, editor.font_size * textFile->cursor.line_num};
+    }
     char cursor_char = textFile->cursor.line->items[cursor_pos];
     textFile->cursor.line->items[cursor_pos] = '\0';
     Vector2 cursor_vec_pos = MeasureTextEx(editor.font, textFile->cursor.line->items, editor.font_size, editor.font_spacing);
@@ -370,7 +282,10 @@ void TextFile_Logic()
     editor.cursor_pos = TextFile_GetCursorPosition(editor.currentTextFile);
 
     if (editor.key_pressed == KEY_BACKSPACE)
-        TextFile_RemoveChar(&editor.currentTextFile);
+        TextFile_RemoveChar_Left(&editor.currentTextFile);
+
+    if (editor.key_pressed == KEY_DELETE)
+        TextFile_RemoveChar_Right(&editor.currentTextFile);
 
     if (editor.char_pressed != 0)
         TextFile_InsertChar(&editor.currentTextFile, editor.char_pressed);

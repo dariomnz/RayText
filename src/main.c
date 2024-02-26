@@ -7,7 +7,7 @@ extern Editor editor;
 
 struct DArray_int
 {
-    char *items;      // Array of elements can have any type
+    int *items;      // Array of elements can have any type
     size_t count;    // Count of current elements
     size_t capacity; // Capacity of current items in memory
 };
@@ -17,32 +17,37 @@ struct DArray_int
 int main()
 {
     struct DArray_int array = {0};
-    darray_append(&array, 'H');
-    darray_append(&array, 'o');
-    darray_append(&array, 'l');
-    darray_append(&array, 'a');
-    printf("Text: %s\n",array.items);
+    DArray_append(&array, 1);
+    DArray_append(&array, 2);
+    DArray_append(&array, 3);
+    DArray_append(&array, 4);
     // exit(0);
-    darray_append(&array, 5);
-    darray_insert(&array, 10, 0);
+    DArray_append(&array, 5);
+    DArray_insert(&array, 10, 0);
     for (size_t i = 0; i < 10; i++)
     {
-        darray_insert(&array, i,2);
+        DArray_insert(&array, i, 2);
     }
 
     for (size_t i = 0; i < array.count; i++)
     {
-        printf("Item i %ld: %c\n", i, array.items[i]);
+        printf("Item i %ld: %d\n", i, array.items[i]);
     }
 
     printf("----------------------\n");
-    darray_remove(&array, 0);
+    DArray_remove(&array, 0);
     for (size_t i = 0; i < array.count; i++)
     {
-        printf("Item i %ld: %c\n", i, array.items[i]);
+        printf("Item i %ld: %d\n", i, array.items[i]);
+    }
+    printf("----------------------\n");
+    DArray_remove_from(&array, 3);
+    for (size_t i = 0; i < array.count; i++)
+    {
+        printf("Item i %ld: %d\n", i, array.items[i]);
     }
 
-    darray_free(&array);
+    DArray_free(&array);
     // exit(0);
     // Initialization
     //--------------------------------------------------------------------------------------

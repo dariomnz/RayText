@@ -2,11 +2,12 @@
 
 Editor editor = {0};
 
-int keys_to_check[6] = {KEY_RIGHT,
+int keys_to_check[7] = {KEY_RIGHT,
                         KEY_LEFT,
                         KEY_UP,
                         KEY_DOWN,
                         KEY_BACKSPACE,
+                        KEY_DELETE,
                         KEY_ENTER};
 
 void Editor_Init()
