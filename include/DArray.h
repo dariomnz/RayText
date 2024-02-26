@@ -3,6 +3,7 @@
 
 #include <ctype.h>
 #include <assert.h>
+#include <stdlib.h>
 
 typedef struct DArray_char
 {
@@ -46,19 +47,19 @@ typedef struct DArray_char
     } while (0)
 
 // Insert an item to a dynamic array in an index
-#define DArray_insert(da, item, index)                                                                           \
-    do                                                                                                           \
-    {                                                                                                            \
-        if ((da)->count >= (da)->capacity)                                                                       \
-        {                                                                                                        \
-            (da)->capacity = (da)->capacity == 0 ? DArray_INIT_CAP : (da)->capacity * 2;                         \
-            (da)->items = realloc((da)->items, (da)->capacity * sizeof(*(da)->items));                           \
-            assert((da)->items != NULL && "Insuficient memory");                                                 \
-            memset((da)->items + (da)->count, 0, ((da)->capacity - (da)->count) * sizeof(*(da)->items));         \
-        }                                                                                                        \
+#define DArray_insert(da, item, index)                                                                               \
+    do                                                                                                               \
+    {                                                                                                                \
+        if ((da)->count >= (da)->capacity)                                                                           \
+        {                                                                                                            \
+            (da)->capacity = (da)->capacity == 0 ? DArray_INIT_CAP : (da)->capacity * 2;                             \
+            (da)->items = realloc((da)->items, (da)->capacity * sizeof(*(da)->items));                               \
+            assert((da)->items != NULL && "Insuficient memory");                                                     \
+            memset((da)->items + (da)->count, 0, ((da)->capacity - (da)->count) * sizeof(*(da)->items));             \
+        }                                                                                                            \
         memmove((da)->items + ((index) + 1), (da)->items + (index), ((da)->count - (index)) * sizeof(*(da)->items)); \
-        (da)->items[index] = (item);                                                                             \
-        (da)->count++;                                                                                           \
+        (da)->items[index] = (item);                                                                                 \
+        (da)->count++;                                                                                               \
     } while (0)
 
 // Remove an item of a dynamic array in the index
@@ -101,6 +102,13 @@ typedef struct DArray_char
         (da)->count -= (how_many);                                                                                                         \
     } while (0)
 
-#define DArray_free(da) \
-    free((da)->items)
+#define DArray_free(da)            \
+    do                             \
+    {                              \
+        if (((da)->capacity) == 0) \
+        {                          \
+            break;                 \
+        }                          \
+        free((da)->items);         \
+    } while (0)
 #endif // DArray_H

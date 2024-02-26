@@ -1,4 +1,6 @@
 #include "Command.h"
+#include <ctype.h>
+#include <stdlib.h>
 
 extern Editor editor;
 

@@ -12,7 +12,6 @@ TextFile TextFile_Load(const char *file_name)
     size_t last_line = 0;
     Line *new_line;
     size_t i = 0;
-    printf("%s", data);
     for (i = 0; i < strlen(data); i++)
     {
         if (data[i] == '\n')
@@ -37,7 +36,7 @@ TextFile TextFile_Load(const char *file_name)
     return textFile;
 }
 
-TextFile TextFile_LoadEmpty()
+TextFile TextFile_LoadEmpty(void)
 {
     TextFile textFile = {0};
     sprintf(textFile.name, "empty.txt");
@@ -60,7 +59,7 @@ TextFile TextFile_LoadEmpty()
     return textFile;
 }
 
-DArray_char TextFile_to_string()
+DArray_char TextFile_to_string(void)
 {
     TextFile *textFile = &editor.currentTextFile;
     DArray_char data = {0};
@@ -73,7 +72,7 @@ DArray_char TextFile_to_string()
     return data;
 }
 
-void TextFile_Save()
+void TextFile_Save(void)
 {
     TextFile *textFile = &editor.currentTextFile;
     DEBUG("Saving: %s", textFile->name);
@@ -84,7 +83,7 @@ void TextFile_Save()
     DArray_free(&data);
 }
 
-void TextFile_Free()
+void TextFile_Free(void)
 {
     TextFile *textFile = &editor.currentTextFile;
     for (size_t i = 0; i < textFile->count; i++)
@@ -96,7 +95,7 @@ void TextFile_Free()
     DArray_free(textFile);
 }
 
-void TextFile_Print()
+void TextFile_Print(void)
 {
     TextFile *textFile = &editor.currentTextFile;
     printf("--------File \"%s\"--------\n", textFile->name);
@@ -107,7 +106,7 @@ void TextFile_Print()
     printf("------End file \"%s\"------\n", textFile->name);
 }
 
-void TextFile_InsertChar()
+void TextFile_InsertChar(void)
 {
     TextFile *textFile = &editor.currentTextFile;
 
@@ -115,7 +114,7 @@ void TextFile_InsertChar()
     textFile->cursor.position++;
 }
 
-void TextFile_InsertNewLine()
+void TextFile_InsertNewLine(void)
 {
     TextFile *textFile = &editor.currentTextFile;
     size_t new_line_pos = textFile->cursor.line_num + 1;
@@ -143,7 +142,7 @@ void TextFile_InsertNewLine()
     textFile->cursor.position = 0;
 }
 
-void TextFile_RemoveLine_Left()
+void TextFile_RemoveLine_Left(void)
 {
     TextFile *textFile = &editor.currentTextFile;
     if (textFile->cursor.line_num == 0)
@@ -159,7 +158,7 @@ void TextFile_RemoveLine_Left()
     textFile->cursor.position = position_pre_line;
 }
 
-void TextFile_RemoveLine_Right()
+void TextFile_RemoveLine_Right(void)
 {
     TextFile *textFile = &editor.currentTextFile;
     if (textFile->cursor.line_num + 1 == textFile->count)
@@ -169,14 +168,14 @@ void TextFile_RemoveLine_Right()
     DArray_remove(textFile, textFile->cursor.line_num + 1);
 }
 
-void TextFile_RemoveChar_Left()
+void TextFile_RemoveChar_Left(void)
 {
     TextFile *textFile = &editor.currentTextFile;
 
     size_t cursor_pos = textFile->cursor.position;
     if (cursor_pos == 0)
     {
-        TextFile_RemoveLine_Left(textFile);
+        TextFile_RemoveLine_Left();
         return;
     }
 
@@ -186,21 +185,21 @@ void TextFile_RemoveChar_Left()
     textFile->cursor.position--;
 }
 
-void TextFile_RemoveChar_Right()
+void TextFile_RemoveChar_Right(void)
 {
     TextFile *textFile = &editor.currentTextFile;
 
     size_t cursor_pos = textFile->cursor.position;
     if (cursor_pos == textFile->cursor.line->count)
     {
-        TextFile_RemoveLine_Right(textFile);
+        TextFile_RemoveLine_Right();
         return;
     }
 
     DArray_remove(textFile->cursor.line, cursor_pos);
 }
 
-void TextFile_MoveCursor()
+void TextFile_MoveCursor(void)
 {
     TextFile *textFile = &editor.currentTextFile;
     switch (editor.key_pressed)
@@ -257,7 +256,7 @@ void TextFile_MoveCursor()
     // DEBUG("cursor_pos %ld str_size %ld line %ld char %c", textFile->cursor.position, textFile->cursor.line->count, textFile->cursor.line_num, textFile->cursor.line->items[textFile->cursor.line->count - 1]);
 }
 
-Vector2 TextFile_GetCursorPosition()
+Vector2 TextFile_GetCursorPosition(void)
 {
     TextFile *textFile = &editor.currentTextFile;
     size_t cursor_pos = textFile->cursor.position;
@@ -273,36 +272,43 @@ Vector2 TextFile_GetCursorPosition()
     return cursor_vec_pos;
 }
 
-void TextFile_Logic()
+void TextFile_Logic(void)
 {
     if (editor.editor_state != STATE_TEXTFILE)
         return;
 
-    TextFile_MoveCursor(&editor.currentTextFile);
-    editor.cursor_pos = TextFile_GetCursorPosition(editor.currentTextFile);
+    TextFile_MoveCursor();
+    editor.cursor_pos = TextFile_GetCursorPosition();
 
     if (editor.key_pressed == KEY_BACKSPACE)
-        TextFile_RemoveChar_Left(&editor.currentTextFile);
+        TextFile_RemoveChar_Left();
 
     if (editor.key_pressed == KEY_DELETE)
-        TextFile_RemoveChar_Right(&editor.currentTextFile);
+        TextFile_RemoveChar_Right();
 
     if (editor.char_pressed != 0)
-        TextFile_InsertChar(&editor.currentTextFile, editor.char_pressed);
+        TextFile_InsertChar();
+
+    if (editor.key_pressed == KEY_TAB)
+    {
+        editor.char_pressed = ' ';
+        for (int i = 0; i < 4; i++)
+            TextFile_InsertChar();
+    }
 
     if (editor.key_pressed == KEY_ENTER)
-        TextFile_InsertNewLine(&editor.currentTextFile);
+        TextFile_InsertNewLine();
 
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
     {
-        TextFile_Save(editor.currentTextFile);
+        TextFile_Save();
     }
 }
 
 int final_num_pos = 0;
 char str_line_number[10];
 Vector2 str_line_number_size;
-void TextFile_Draw()
+void TextFile_Draw(void)
 {
     if (editor.editor_state != STATE_TEXTFILE && editor.editor_state != STATE_COMMAND)
         return;

@@ -2,10 +2,11 @@
 
 Editor editor = {0};
 
-int keys_to_check[7] = {KEY_RIGHT,
+int keys_to_check[8] = {KEY_RIGHT,
                         KEY_LEFT,
                         KEY_UP,
                         KEY_DOWN,
+                        KEY_TAB,
                         KEY_BACKSPACE,
                         KEY_DELETE,
                         KEY_ENTER};
@@ -97,7 +98,8 @@ void Editor_Draw()
 
 void Editor_Close()
 {
-    TextFile_Free(editor.currentTextFile);
+    TextFile_Free();
+    Directory_Free();
     UnloadFont(editor.font);
 
     CloseWindow(); // Close window and OpenGL context
