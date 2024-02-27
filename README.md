@@ -1,5 +1,9 @@
 # RayText
 
+<p align=center>
+  <img style="height: 256px" src="./resources/images/icon.png">
+</p>
+
 RayText is a lightweight text editor implemented in C with Raylib.
 
 # Instructions

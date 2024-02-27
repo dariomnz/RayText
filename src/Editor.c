@@ -19,7 +19,11 @@ void Editor_Init()
     editor.screenHeight = 450;
     InitWindow(editor.screenWidth, editor.screenHeight, "RayText");
 
-    editor.font = LoadFontEx("." PATH_SEPARATOR "fonts" PATH_SEPARATOR "Monaco.ttf", 82, 0, 0);
+    Image icon = LoadImage("." PATH_SEPARATOR "resources" PATH_SEPARATOR "images" PATH_SEPARATOR "icon.png");
+    SetWindowIcon(icon);
+    UnloadImage(icon);
+
+    editor.font = LoadFontEx("." PATH_SEPARATOR "resources" PATH_SEPARATOR "fonts" PATH_SEPARATOR "Monaco.ttf", 82, 0, 0);
     SetTextureFilter(editor.font.texture, TEXTURE_FILTER_BILINEAR);
     editor.font_size = 20;
     editor.font_spacing = 0;
