@@ -11,5 +11,6 @@ void Command_Consume();
 
 void Command_Logic();
 void Command_Draw();
+void Command_Free();
 
 #endif // Command_H

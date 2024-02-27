@@ -105,6 +105,7 @@ void Editor_Close()
 {
     TextFile_Free();
     Directory_Free();
+    Command_Free();
     UnloadFont(editor.font);
 
     CloseWindow(); // Close window and OpenGL context

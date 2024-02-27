@@ -126,6 +126,7 @@ void Command_Draw()
     int centerX = GetScreenWidth() / 2;
     int centerY = editor.font_size;
     Vector2 command_size = MeasureTextEx(editor.font, editor.currentCommand.items, editor.font_size, editor.font_spacing);
+    command_size.y = editor.font_size;
     int width = GetScreenWidth() * 0.66f;
     int height = command_size.y + 5;
     if (width < command_size.x)
@@ -133,4 +134,9 @@ void Command_Draw()
     DrawRectangleCenter(centerX, centerY, width + 5, height + 5, WHITE);
     DrawRectangleCenter(centerX, centerY, width, height, DARKGRAY);
     DrawTextExCenter(editor.font, editor.currentCommand.items, (Vector2){centerX, centerY}, editor.font_size, editor.font_spacing, WHITE);
+}
+
+void Command_Free()
+{
+    DArray_free(&editor.currentCommand);
 }
