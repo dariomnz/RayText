@@ -3,6 +3,7 @@
 RayText is a lightweight text editor implemented in C with Raylib.
 
 # Instructions
+
 ```
 Key bindings:
     Ctrl + P                -> Open commands
@@ -17,16 +18,42 @@ In commands:
     ":<line to go>"         -> go to the line
 ```
 
-# Build
+# Linux
+
+### Build
+
 ```bash
 ./build.sh
 ```
-# Run
+
+### Run
+
 ```bash
 ./RayText
 ```
 
-## Build and run
+### Build and run
+
 ```bash
 ./build.sh run
+```
+
+# Windows
+
+### Build in cmd
+
+```bash
+build.bat
+```
+
+### Run
+
+```bash
+RayText.exe
+```
+
+### Build and run
+
+```bash
+build.bat run
 ```

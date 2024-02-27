@@ -26,7 +26,7 @@ void Directory_Update(const char *dir_name)
     else
     {
         strncpy(aux2, editor.currentDirectory.name, 1023);
-        sprintf(editor.currentDirectory.name, "%s/%s", aux2, dir_name);
+        sprintf(editor.currentDirectory.name, "%s" PATH_SEPARATOR "%s", aux2, dir_name);
     }
 }
 
@@ -119,7 +119,7 @@ void Directory_Logic()
     if (editor.key_pressed == KEY_ENTER)
     {
         char aux[MAX_PATH + MAX_PATH];
-        snprintf(aux, MAX_PATH + MAX_PATH, "%s/%s", editor.currentDirectory.name, editor.currentDirectory.items[editor.currentDirectory.selected]->items);
+        snprintf(aux, MAX_PATH + MAX_PATH, "%s" PATH_SEPARATOR "%s", editor.currentDirectory.name, editor.currentDirectory.items[editor.currentDirectory.selected]->items);
         if (IsPathFile(aux))
         {
             TextFile_Free();
@@ -144,7 +144,7 @@ void Directory_Draw()
     for (int a = 0; a < editor.currentDirectory.count; a++)
     {
         char aux[MAX_PATH + MAX_PATH];
-        snprintf(aux, MAX_PATH + MAX_PATH, "%s/%s", editor.currentDirectory.name, editor.currentDirectory.items[a]->items);
+        snprintf(aux, MAX_PATH + MAX_PATH, "%s" PATH_SEPARATOR "%s", editor.currentDirectory.name, editor.currentDirectory.items[a]->items);
         if (IsPathFile(aux))
             color = WHITE;
         else
