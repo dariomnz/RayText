@@ -23,8 +23,9 @@ void Editor_Init()
     SetTextureFilter(editor.font.texture, TEXTURE_FILTER_BILINEAR);
     editor.font_size = 20;
     editor.font_spacing = 0;
-    editor.currentCommand[0] = '\0';
+    memset(&editor.currentCommand, 0, sizeof(DArray_char));
     editor.currentTextFile = TextFile_LoadEmpty();
+    memset(&editor.currentDirectory, 0, sizeof(Directory));
 
     editor.zoom = 1.0f;
     editor.camera.zoom = 1.0f;

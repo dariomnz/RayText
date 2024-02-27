@@ -22,7 +22,7 @@ struct Editor
     int screenWidth;
     int screenHeight;
     TextFile currentTextFile;
-    char currentCommand[MAX_COMMAND_LEN];
+    DArray_char currentCommand;
     Directory currentDirectory;
     Font font;
     int font_size;

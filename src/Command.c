@@ -6,21 +6,12 @@ extern Editor editor;
 
 void Command_InsertChar()
 {
-    size_t str_len = strlen(editor.currentCommand);
-    if (str_len < MAX_COMMAND_LEN)
-    {
-        editor.currentCommand[str_len] = editor.char_pressed;
-        editor.currentCommand[str_len + 1] = '\0';
-    }
+    DArray_append(&editor.currentCommand, editor.char_pressed);
 }
 
 void Command_RemoveChar()
 {
-    size_t str_len = strlen(editor.currentCommand);
-    if (str_len != 0)
-    {
-        editor.currentCommand[str_len - 1] = '\0';
-    }
+    DArray_remove(&editor.currentCommand, editor.currentCommand.count - 1);
 }
 
 /// @brief strstart( "123456789", "123" ) = true
@@ -64,35 +55,33 @@ char *trimwhitespace(char *str)
 
 void Command_Consume()
 {
-    size_t str_len = strlen(editor.currentCommand);
-
-    if (strlen(editor.currentCommand) == 0)
+    if (editor.currentCommand.count == 0)
         return;
-    if (editor.currentCommand[0] == '>')
+    if (editor.currentCommand.items[0] == '>')
     {
-        if (strcmp(editor.currentCommand, ">save") == 0)
+        if (strcmp(editor.currentCommand.items, ">save") == 0)
         {
             DEBUG(">save");
             TextFile_Save(editor.currentTextFile);
         }
-        else if (strcmp(editor.currentCommand, ">exit") == 0)
+        else if (strcmp(editor.currentCommand.items, ">exit") == 0)
         {
             DEBUG(">exit");
             editor.the_end = true;
         }
-        else if (strstart(editor.currentCommand, ">dir"))
+        else if (strstart(editor.currentCommand.items, ">dir"))
         {
-            char aux_str[MAX_COMMAND_LEN];
-            strncpy(aux_str, &editor.currentCommand[4], MAX_COMMAND_LEN);
+            char aux_str[MAX_PATH];
+            strncpy(aux_str, &editor.currentCommand.items[4], MAX_PATH);
             DEBUG(">dir Name of dir: %s", aux_str);
             Directory_Load(trimwhitespace(aux_str));
             editor.editor_state = STATE_DIRECTORY;
         }
     }
-    else if (editor.currentCommand[0] == ':')
+    else if (editor.currentCommand.items[0] == ':')
     {
         char *endptr;
-        long val = strtol(&editor.currentCommand[1], &endptr, 10);
+        long val = strtol(&editor.currentCommand.items[1], &endptr, 10);
         if (*endptr == '\0')
         {
             DEBUG("go to line: %ld", val);
@@ -105,7 +94,7 @@ void Command_Consume()
         }
     }
 
-    editor.currentCommand[0] = '\0';
+    DArray_remove_from(&editor.currentCommand, 0);
     if (editor.editor_state == STATE_COMMAND)
         editor.editor_state = STATE_TEXTFILE;
 }
@@ -136,12 +125,12 @@ void Command_Draw()
         return;
     int centerX = GetScreenWidth() / 2;
     int centerY = editor.font_size;
-    Vector2 command_size = MeasureTextEx(editor.font, editor.currentCommand, editor.font_size, editor.font_spacing);
+    Vector2 command_size = MeasureTextEx(editor.font, editor.currentCommand.items, editor.font_size, editor.font_spacing);
     int width = GetScreenWidth() * 0.66f;
     int height = command_size.y + 5;
     if (width < command_size.x)
         width = command_size.x + 5;
     DrawRectangleCenter(centerX, centerY, width + 5, height + 5, WHITE);
     DrawRectangleCenter(centerX, centerY, width, height, DARKGRAY);
-    DrawTextExCenter(editor.font, editor.currentCommand, (Vector2){centerX, centerY}, editor.font_size, editor.font_spacing, WHITE);
+    DrawTextExCenter(editor.font, editor.currentCommand.items, (Vector2){centerX, centerY}, editor.font_size, editor.font_spacing, WHITE);
 }

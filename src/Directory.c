@@ -45,8 +45,8 @@ void Directory_Load(const char *dir_name)
     for (i = 0; i < filePathList.count; i++)
     {
         aux = GetFileName(filePathList.paths[i]);
-        Directory_name *name = malloc(sizeof(Directory_name));
-        memset(name, 0, sizeof(Directory_name));
+        DArray_char *name = malloc(sizeof(DArray_char));
+        memset(name, 0, sizeof(DArray_char));
         DArray_append_many(name, aux, strlen(aux));
 
         DArray_append(&editor.currentDirectory, name);
@@ -54,19 +54,19 @@ void Directory_Load(const char *dir_name)
     UnloadDirectoryFiles(filePathList);
 
     // Pre dir
-    Directory_name *name_pre = malloc(sizeof(Directory_name));
-    memset(name_pre, 0, sizeof(Directory_name));
+    DArray_char *name_pre = malloc(sizeof(DArray_char));
+    memset(name_pre, 0, sizeof(DArray_char));
     DArray_append_many(name_pre, "..", 2);
     DArray_insert(&editor.currentDirectory, name_pre, 0);
 
     // Current dir
-    Directory_name *name_current = malloc(sizeof(Directory_name));
-    memset(name_current, 0, sizeof(Directory_name));
+    DArray_char *name_current = malloc(sizeof(DArray_char));
+    memset(name_current, 0, sizeof(DArray_char));
     DArray_append_many(name_current, ".", 1);
     DArray_insert(&editor.currentDirectory, name_current, 0);
 
     // Sorting files alphabetically
-    Directory_name *tmp;
+    DArray_char *tmp;
     for (k = 0; k < editor.currentDirectory.count; k++)
         for (j = k + 1; j < editor.currentDirectory.count; j++)
         {
@@ -121,7 +121,6 @@ void Directory_Logic()
         char aux[MAX_PATH + MAX_PATH];
         snprintf(aux, MAX_PATH + MAX_PATH, "%s/%s", editor.currentDirectory.name, editor.currentDirectory.items[editor.currentDirectory.selected]->items);
         if (IsPathFile(aux))
-        // if (editor.currentDirectory.data[editor.currentDirectory.selected]->d_type == DT_REG)
         {
             TextFile_Free();
             editor.currentTextFile = TextFile_Load(aux);
