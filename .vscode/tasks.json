@@ -2,9 +2,19 @@
 	"version": "2.0.0",
 	"tasks": [
         {
-			"label": "Build RayText",
+			"label": "Build RayText Linux",
             "type": "shell",
             "command": "./build.sh",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+			"label": "Build RayText Windows",
+            "type": "shell",
+            "command": "build.bat",
             "args": [],
             "group": {
                 "kind": "build",

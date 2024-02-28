@@ -5,11 +5,36 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch RayText",
+            "name": "(gdb) Launch RayText Linux",
             "type": "cppdbg",
             "request": "launch",
-            "preLaunchTask": "Build RayText",
+            "preLaunchTask": "Build RayText Linux",
             "program": "${workspaceFolder}/RayText",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Launch RayText Windows",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "Build RayText Windows",
+            "program": "${workspaceFolder}/RayText.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
