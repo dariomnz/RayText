@@ -295,6 +295,53 @@ Vector2 TextFile_GetCursorPosition(void)
     return cursor_vec_pos;
 }
 
+void TextFile_CheckClickCursorPosition(void)
+{
+    if (!IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        return;
+
+    Vector2 cursor_world_position = GetMousePosition();
+    cursor_world_position = GetScreenToWorld2D(cursor_world_position, editor.camera);
+
+    int plus_minus_lines = (editor.screenHeight / editor.camera.zoom) / editor.font_size / 2;
+    int current_line = editor.currentTextFile.cursor.line_num;
+    int i;
+    Rectangle line_collision_box = {0};
+    Vector2 line_size = {0};
+    for (i = current_line - plus_minus_lines; i < current_line + plus_minus_lines; i++)
+    {
+        if (i < 0)
+            continue;
+        if (i >= editor.currentTextFile.count)
+            break;
+        line_collision_box.y = editor.font_size * i;
+        line_size = MeasureTextEx(editor.font, editor.currentTextFile.items[i]->items, editor.font_size, editor.font_spacing);
+        line_collision_box.width = line_size.x + editor.screenWidth;
+        line_collision_box.height = editor.font_size;
+        if (CheckCollisionPointRec(cursor_world_position, line_collision_box))
+        {
+            DArray_char aux = {0};
+            size_t new_pos = __SIZE_MAX__ - 1;
+            for (size_t j = 0; j < editor.currentTextFile.items[i]->count; j++)
+            {
+                DArray_append(&aux, editor.currentTextFile.items[i]->items[j]);
+                line_size = MeasureTextEx(editor.font, aux.items, editor.font_size, editor.font_spacing);
+                if (cursor_world_position.x < line_size.x)
+                {
+                    new_pos = j;
+                    break;
+                }
+            }
+
+            editor.currentTextFile.cursor.line_num = i;
+            editor.currentTextFile.cursor.line = editor.currentTextFile.items[i];
+            editor.currentTextFile.cursor.position = new_pos;
+            DArray_free(&aux);
+            break;
+        }
+    }
+}
+
 void TextFile_Logic(void)
 {
     if (editor.editor_state != STATE_TEXTFILE)
@@ -303,9 +350,7 @@ void TextFile_Logic(void)
     TextFile_MoveCursor();
     editor.cursor_pos = TextFile_GetCursorPosition();
 
-    Vector2 position = GetMousePosition();
-    position = GetScreenToWorld2D(position, editor.camera);
-    DEBUG("mouse x:y %02f:%02f", position.x, position.y);
+    TextFile_CheckClickCursorPosition();
 
     if (editor.key_pressed == KEY_BACKSPACE)
         TextFile_RemoveChar_Left();
