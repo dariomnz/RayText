@@ -4,12 +4,12 @@
 
 extern Editor editor;
 
-void Command_InsertChar()
+void Command_InsertChar(void)
 {
     DArray_append(&editor.currentCommand, editor.char_pressed);
 }
 
-void Command_RemoveChar()
+void Command_RemoveChar(void)
 {
     DArray_remove(&editor.currentCommand, editor.currentCommand.count - 1);
 }
@@ -31,29 +31,17 @@ bool strstart(char *str1, char *str2)
     return true;
 }
 
-char *trimwhitespace(char *str)
+void trimwhitespace(DArray_char *str)
 {
-    char *end;
-
     // Trim leading space
-    while (isspace((unsigned char)*str))
-        str++;
-
-    if (*str == 0) // All spaces?
-        return str;
-
+    while (str->items[0] == ' ')
+        DArray_remove(str, 0);
     // Trim trailing space
-    end = str + strlen(str) - 1;
-    while (end > str && isspace((unsigned char)*end))
-        end--;
-
-    // Write new null terminator character
-    end[1] = '\0';
-
-    return str;
+    while (str->items[str->count - 1] == ' ')
+        DArray_remove(str, str->count - 1);
 }
 
-void Command_Consume()
+void Command_Consume(void)
 {
     if (editor.currentCommand.count == 0)
         return;
@@ -62,7 +50,7 @@ void Command_Consume()
         if (strcmp(editor.currentCommand.items, ">save") == 0)
         {
             DEBUG(">save");
-            TextFile_Save(editor.currentTextFile);
+            TextFile_Save();
         }
         else if (strcmp(editor.currentCommand.items, ">exit") == 0)
         {
@@ -71,11 +59,13 @@ void Command_Consume()
         }
         else if (strstart(editor.currentCommand.items, ">dir"))
         {
-            char aux_str[MAX_PATH];
-            strncpy(aux_str, &editor.currentCommand.items[4], MAX_PATH);
-            DEBUG(">dir Name of dir: %s", aux_str);
-            Directory_Load(trimwhitespace(aux_str));
+            DArray_char aux = {0};
+            DArray_append_many(&aux, &editor.currentCommand.items[4], editor.currentCommand.count - 4);
+            trimwhitespace(&aux);
+            DEBUG(">dir Name of dir: %s", aux.items);
+            Directory_Load(&aux);
             editor.editor_state = STATE_DIRECTORY;
+            DArray_free(&aux);
         }
     }
     else if (editor.currentCommand.items[0] == ':')
@@ -94,12 +84,12 @@ void Command_Consume()
         }
     }
 
-    DArray_remove_from(&editor.currentCommand, 0);
+    DArray_clear(&editor.currentCommand);
     if (editor.editor_state == STATE_COMMAND)
         editor.editor_state = STATE_TEXTFILE;
 }
 
-void Command_Logic()
+void Command_Logic(void)
 {
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_P))
         editor.editor_state = STATE_COMMAND;
@@ -111,7 +101,7 @@ void Command_Logic()
         Command_RemoveChar();
 
     if (editor.char_pressed != 0)
-        Command_InsertChar(editor.char_pressed);
+        Command_InsertChar();
 
     if (editor.key_pressed == KEY_ENTER)
     {
@@ -119,7 +109,7 @@ void Command_Logic()
     }
 }
 
-void Command_Draw()
+void Command_Draw(void)
 {
     if (editor.editor_state != STATE_COMMAND)
         return;
@@ -136,7 +126,7 @@ void Command_Draw()
     DrawTextExCenter(editor.font, editor.currentCommand.items, (Vector2){centerX, centerY}, editor.font_size, editor.font_spacing, WHITE);
 }
 
-void Command_Free()
+void Command_Free(void)
 {
     DArray_free(&editor.currentCommand);
 }

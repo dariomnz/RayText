@@ -11,7 +11,7 @@ int keys_to_check[8] = {KEY_RIGHT,
                         KEY_DELETE,
                         KEY_ENTER};
 
-void Editor_Init()
+void Editor_Init(void)
 {
     if (editor.initialized != 0)
         return;
@@ -41,7 +41,7 @@ void Editor_Init()
     editor.the_end = false;
 }
 
-void Editor_Logic()
+void Editor_Logic(void)
 {
     if (IsWindowResized())
     {
@@ -81,7 +81,7 @@ void Editor_Logic()
         editor.camera.zoom = Lerp(editor.camera.zoom, editor.zoom, 0.1f);
 }
 
-void Editor_Draw()
+void Editor_Draw(void)
 {
     ClearBackground(BLACK);
 
@@ -101,7 +101,7 @@ void Editor_Draw()
     DrawFPS(0, 0);
 }
 
-void Editor_Close()
+void Editor_Close(void)
 {
     TextFile_Free();
     Directory_Free();

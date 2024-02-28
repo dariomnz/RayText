@@ -8,8 +8,6 @@
 #include "rlgl.h"
 #include "raymath.h"
 
-#define MAX_PATH 1024
-
 #ifdef _WIN32
 #define PATH_SEPARATOR "\\"
 #else

@@ -3,28 +3,28 @@
 
 extern Editor editor;
 
-TextFile TextFile_Load(const char *file_name)
+TextFile TextFile_Load(const DArray_char *file_name)
 {
     TextFile textFile = {0};
-    sprintf(textFile.name, "%s", file_name);
-    DEBUG("Opening file: %s", file_name);
-    char *data = LoadFileText(file_name);
+    DArray_append_many(&textFile.name, file_name->items, file_name->count);
+    DEBUG("Opening file: %s", file_name->items);
+    char *data = LoadFileText(file_name->items);
     size_t last_line = 0;
-    Line *new_line;
+    DArray_char *new_line;
     size_t i = 0;
     for (i = 0; i < strlen(data); i++)
     {
         if (data[i] == '\n')
         {
-            new_line = malloc(sizeof(Line));
-            memset(new_line, 0, sizeof(Line));
+            new_line = malloc(sizeof(DArray_char));
+            memset(new_line, 0, sizeof(DArray_char));
             DArray_append_many(new_line, &data[last_line], i - last_line);
             DArray_append(&textFile, new_line);
             last_line = i + 1;
         }
     }
-    new_line = malloc(sizeof(Line));
-    memset(new_line, 0, sizeof(Line));
+    new_line = malloc(sizeof(DArray_char));
+    memset(new_line, 0, sizeof(DArray_char));
     DArray_append_many(new_line, &data[last_line], i - last_line);
     DArray_append(&textFile, new_line);
     UnloadFileText(data);
@@ -39,15 +39,15 @@ TextFile TextFile_Load(const char *file_name)
 TextFile TextFile_LoadEmpty(void)
 {
     TextFile textFile = {0};
-    sprintf(textFile.name, "empty.txt");
+    DArray_append_many(&textFile.name, "empty.txt", 10);
 
-    Line *new_line = malloc(sizeof(Line));
+    DArray_char *new_line = malloc(sizeof(DArray_char));
     if (new_line == NULL)
     {
-        DEBUG("Error: malloc of size: %ld", sizeof(Line));
+        DEBUG("Error: malloc of size: %ld", sizeof(DArray_char));
         return textFile;
     }
-    memset(new_line, 0, sizeof(Line));
+    memset(new_line, 0, sizeof(DArray_char));
 
     DArray_append(&textFile, new_line);
 
@@ -77,8 +77,8 @@ void TextFile_Save(void)
     TextFile *textFile = &editor.currentTextFile;
     DEBUG("Saving: %s", textFile->name);
     DArray_char data = TextFile_to_string();
-
-    SaveFileText(textFile->name, data.items);
+    
+    SaveFileText(textFile->name.items, data.items);
 
     DArray_free(&data);
 }
@@ -121,13 +121,13 @@ void TextFile_InsertNewLine(void)
     size_t new_line_chars = textFile->cursor.line->count - textFile->cursor.position;
 
     // Build new line
-    Line *new_line2 = malloc(sizeof(Line));
+    DArray_char *new_line2 = malloc(sizeof(DArray_char));
     if (new_line2 == NULL)
     {
-        DEBUG("Error: malloc of size: %ld", sizeof(Line));
+        DEBUG("Error: malloc of size: %ld", sizeof(DArray_char));
         return;
     }
-    memset(new_line2, 0, sizeof(Line));
+    memset(new_line2, 0, sizeof(DArray_char));
     DArray_append_many(new_line2, &textFile->cursor.line->items[textFile->cursor.position], new_line_chars);
 
     DArray_insert(textFile, new_line2, new_line_pos);

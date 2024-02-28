@@ -5,12 +5,12 @@
 #include "Directory.h"
 #include "Editor.h"
 
-void Command_InsertChar();
-void Command_RemoveChar();
-void Command_Consume();
+void Command_InsertChar(void);
+void Command_RemoveChar(void);
+void Command_Consume(void);
 
-void Command_Logic();
-void Command_Draw();
-void Command_Free();
+void Command_Logic(void);
+void Command_Draw(void);
+void Command_Free(void);
 
 #endif // Command_H

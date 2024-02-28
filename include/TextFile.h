@@ -2,51 +2,43 @@
 #define TextFile_H
 
 #include "Common.h"
-
-typedef struct Line
-{
-    char *items;     // Darray items
-    size_t count;    // Darray count
-    size_t capacity; // Darray capacity
-} Line;
+#include "DArray.h"
 
 typedef struct Cursor
 {
-    Line *line;      // Pointer to line
-    size_t line_num; // Numero de la linea
-    size_t position; // Position in line
+    DArray_char *line; // Pointer to line
+    size_t line_num;   // Numero de la linea
+    size_t position;   // Position in line
 } Cursor;
 
 typedef struct TextFile
 {
-    Line **items;    // Darray of pointers to lines
-    size_t count;    // Darray count
-    size_t capacity; // Darray capacity
+    DArray_char **items; // Darray of pointers to lines
+    size_t count;        // Darray count
+    size_t capacity;     // Darray capacity
 
-    Cursor cursor;  // Cursor
-    char name[256]; // Name of file
+    Cursor cursor;    // Cursor
+    DArray_char name; // Name of file
 } TextFile;
 
 #include "Editor.h"
 
-size_t GetLineNumber(const char *file_name);
+TextFile TextFile_Load(const DArray_char *file_name);
+TextFile TextFile_LoadEmpty(void);
+void TextFile_Free(void);
+void TextFile_Save(void);
 
-TextFile TextFile_Load(const char *file_name);
-TextFile TextFile_LoadEmpty();
-void TextFile_Free();
-void TextFile_Save();
+void TextFile_Print(void);
 
-void TextFile_Print();
+void TextFile_InsertChar(void);
+void TextFile_RemoveChar(void);
+void TextFile_InsertNewLine(void);
+void TextFile_RemovePreLine(void);
 
-void TextFile_InsertChar();
-void TextFile_RemoveChar();
-void TextFile_InsertNewLine();
-void TextFile_RemovePreLine();
+void TextFile_MoveCursor(void);
+Vector2 TextFile_GetCursorPosition(void);
 
-void TextFile_MoveCursor();
-Vector2 TextFile_GetCursorPosition();
-
-void TextFile_Logic();
-void TextFile_Draw();
+void TextFile_Logic(void);
+void TextFile_Draw(void);
 
 #endif // TextFile_H

@@ -102,6 +102,18 @@ typedef struct DArray_char
         (da)->count -= (how_many);                                                                                                         \
     } while (0)
 
+// Clear DArray without free memory
+#define DArray_clear(da)                                            \
+    do                                                              \
+    {                                                               \
+        if ((da)->count == 0)                                       \
+        {                                                           \
+            break;                                                  \
+        }                                                           \
+        memset((da)->items, 0, (da)->count * sizeof(*(da)->items)); \
+        (da)->count = 0;                                            \
+    } while (0)
+
 #define DArray_free(da)            \
     do                             \
     {                              \

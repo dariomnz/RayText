@@ -38,11 +38,11 @@ struct Editor
     bool the_end;
 };
 
-void Editor_Init();
+void Editor_Init(void);
 
-void Editor_Logic();
-void Editor_Draw();
+void Editor_Logic(void);
+void Editor_Draw(void);
 
-void Editor_Close();
+void Editor_Close(void);
 
 #endif // Editor_H
