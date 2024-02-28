@@ -62,6 +62,25 @@ typedef struct DArray_char
         (da)->count++;                                                                                               \
     } while (0)
 
+// Insert several items to a dynamic array
+#define DArray_insert_many(da, new_items, new_items_count, index)                                                                    \
+    do                                                                                                                               \
+    {                                                                                                                                \
+        if ((da)->count + (new_items_count) > (da)->capacity)                                                                        \
+        {                                                                                                                            \
+            if ((da)->capacity == 0)                                                                                                 \
+                (da)->capacity = DArray_INIT_CAP;                                                                                    \
+            while ((da)->count + (new_items_count) > (da)->capacity)                                                                 \
+                (da)->capacity *= 2;                                                                                                 \
+            (da)->items = realloc((da)->items, (da)->capacity * sizeof(*(da)->items));                                               \
+            assert((da)->items != NULL && "Insuficient memory");                                                                     \
+            memset((da)->items + (da)->count, 0, ((da)->capacity - (da)->count) * sizeof(*(da)->items));                             \
+        }                                                                                                                            \
+        memmove((da)->items + ((index) + (new_items_count)), (da)->items + (index), ((da)->count - (index)) * sizeof(*(da)->items)); \
+        memcpy((da)->items + (index), (new_items), (new_items_count) * sizeof(*(da)->items));                                        \
+        (da)->count += (new_items_count);                                                                                            \
+    } while (0)
+
 // Remove an item of a dynamic array in the index
 #define DArray_remove(da, index)                                                                                     \
     do                                                                                                               \

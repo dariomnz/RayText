@@ -75,9 +75,9 @@ DArray_char TextFile_to_string(void)
 void TextFile_Save(void)
 {
     TextFile *textFile = &editor.currentTextFile;
-    DEBUG("Saving: %s", textFile->name);
+    DEBUG("Saving: %s", textFile->name.items);
     DArray_char data = TextFile_to_string();
-    
+
     SaveFileText(textFile->name.items, data.items);
 
     DArray_free(&data);
@@ -98,12 +98,12 @@ void TextFile_Free(void)
 void TextFile_Print(void)
 {
     TextFile *textFile = &editor.currentTextFile;
-    printf("--------File \"%s\"--------\n", textFile->name);
+    printf("--------File \"%s\"--------\n", textFile->name.items);
 
     DArray_char data = TextFile_to_string();
     printf("%s\n", data.items);
     DArray_free(&data);
-    printf("------End file \"%s\"------\n", textFile->name);
+    printf("------End file \"%s\"------\n", textFile->name.items);
 }
 
 void TextFile_InsertChar(void)
@@ -112,6 +112,29 @@ void TextFile_InsertChar(void)
 
     DArray_insert(textFile->cursor.line, editor.char_pressed, textFile->cursor.position);
     textFile->cursor.position++;
+}
+
+void TextFile_InsertStr(const char *str)
+{
+    TextFile *textFile = &editor.currentTextFile;
+    size_t str_size = strlen(str);
+    size_t start = 0;
+    size_t size = 0;
+    size_t i;
+    for (i = 0; i < str_size; i++)
+    {
+        if (str[i] == '\n')
+        {
+            size = i - start - 1;
+            DArray_insert_many(textFile->cursor.line, &str[start], size, textFile->cursor.position);
+            textFile->cursor.position += size;
+            TextFile_InsertNewLine();
+            start = i + 1;
+        }
+    }
+    size = i - start;
+    DArray_insert_many(textFile->cursor.line, &str[start], size, textFile->cursor.position);
+    textFile->cursor.position += size;
 }
 
 void TextFile_InsertNewLine(void)
@@ -280,6 +303,10 @@ void TextFile_Logic(void)
     TextFile_MoveCursor();
     editor.cursor_pos = TextFile_GetCursorPosition();
 
+    Vector2 position = GetMousePosition();
+    position = GetScreenToWorld2D(position, editor.camera);
+    DEBUG("mouse x:y %02f:%02f", position.x, position.y);
+
     if (editor.key_pressed == KEY_BACKSPACE)
         TextFile_RemoveChar_Left();
 
@@ -299,15 +326,26 @@ void TextFile_Logic(void)
     if (editor.key_pressed == KEY_ENTER)
         TextFile_InsertNewLine();
 
-    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
+    if (IsKeyDown(KEY_LEFT_CONTROL))
     {
-        TextFile_Save();
+        if (IsKeyPressed(KEY_S))
+        {
+            TextFile_Save();
+        }
+
+        if (IsKeyPressed(KEY_C))
+        {
+            // TODO: now only copy the entire line
+            SetClipboardText(editor.currentTextFile.cursor.line->items);
+        }
+
+        if (IsKeyPressed(KEY_V))
+        {
+            TextFile_InsertStr(GetClipboardText());
+        }
     }
 }
 
-int final_num_pos = 0;
-char str_line_number[10];
-Vector2 str_line_number_size;
 void TextFile_Draw(void)
 {
     if (editor.editor_state != STATE_TEXTFILE && editor.editor_state != STATE_COMMAND)
@@ -316,6 +354,8 @@ void TextFile_Draw(void)
     int plus_minus_lines = (editor.screenHeight / editor.camera.zoom) / editor.font_size / 2;
     int current_line = editor.currentTextFile.cursor.line_num;
     int i;
+    char str_line_number[10];
+    Vector2 str_line_number_size;
     for (i = current_line - plus_minus_lines; i < current_line + plus_minus_lines; i++)
     {
         if (i < 0)
@@ -330,7 +370,7 @@ void TextFile_Draw(void)
         DrawTextEx(editor.font, str_line_number, (Vector2){-str_line_number_size.x, editor.font_size * i}, editor.font_size, editor.font_spacing, GRAY);
     }
     // Draw line separator numbers
-    final_num_pos = editor.font_size * i;
+    int final_num_pos = editor.font_size * i;
     DrawLineEx((Vector2){-4, 0}, (Vector2){-4, final_num_pos}, 1, GRAY);
     // Draw cursor
     DrawRectangleV(editor.cursor_pos, (Vector2){2, editor.font_size}, WHITE);
