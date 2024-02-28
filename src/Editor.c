@@ -75,10 +75,10 @@ void Editor_Logic(void)
     }
 
     if (Vector2EqualsEpsilon(editor.cursor_pos, editor.camera.target, 0.1f) == 0)
-        editor.camera.target = Vector2Lerp(editor.camera.target, editor.cursor_pos, 0.2f);
+        editor.camera.target = Vector2Lerp(editor.camera.target, editor.cursor_pos, 10.0f * GetFrameTime());
 
     if (FloatEqualsEpsilon(editor.camera.zoom, editor.zoom, 0.01f) == 0)
-        editor.camera.zoom = Lerp(editor.camera.zoom, editor.zoom, 0.1f);
+        editor.camera.zoom = Lerp(editor.camera.zoom, editor.zoom, 10.0f * GetFrameTime());
 }
 
 void Editor_Draw(void)

@@ -396,7 +396,7 @@ void TextFile_Draw(void)
     if (editor.editor_state != STATE_TEXTFILE && editor.editor_state != STATE_COMMAND)
         return;
 
-    int plus_minus_lines = (editor.screenHeight / editor.camera.zoom) / editor.font_size / 2;
+    int plus_minus_lines = (editor.screenHeight / editor.camera.zoom) / editor.font_size / 2 * 1.5f;
     int current_line = editor.currentTextFile.cursor.line_num;
     int i;
     char str_line_number[10];
