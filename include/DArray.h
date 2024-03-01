@@ -140,6 +140,8 @@ typedef struct DArray_char
         {                          \
             break;                 \
         }                          \
+        (da)->capacity = 0;        \
+        (da)->count = 0;           \
         free((da)->items);         \
     } while (0)
 #endif // DArray_H
