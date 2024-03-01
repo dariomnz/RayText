@@ -17,8 +17,10 @@ typedef struct TextFile
     size_t count;        // Darray count
     size_t capacity;     // Darray capacity
 
-    Cursor cursor;    // Cursor
-    DArray_char name; // Name of file
+    Cursor cursor_start_select; // Cursor start select
+    DArray_char cursor_select;  // Cursor select text
+    Cursor cursor;              // Cursor
+    DArray_char name;           // Name of file
 } TextFile;
 
 #include "Editor.h"

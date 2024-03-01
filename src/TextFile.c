@@ -56,20 +56,23 @@ TextFile TextFile_LoadEmpty(void)
     textFile.cursor.line = textFile.items[0];
     textFile.cursor.line_num = 0;
 
+    textFile.cursor_start_select.line = NULL;
+
     return textFile;
 }
 
 DArray_char TextFile_to_string(void)
 {
     TextFile *textFile = &editor.currentTextFile;
-    DArray_char data = {0};
+    // DArray_char data = {0};
+    DArray_clear(&all_file_string);
     for (size_t i = 0; i < textFile->count; i++)
     {
-        DArray_append_many(&data, textFile->items[i]->items, textFile->items[i]->count);
+        DArray_append_many(&all_file_string, textFile->items[i]->items, textFile->items[i]->count);
         if (i != textFile->count - 1)
-            DArray_append(&data, '\n');
+            DArray_append(&all_file_string, '\n');
     }
-    return data;
+    return all_file_string;
 }
 
 void TextFile_Save(void)
@@ -222,13 +225,41 @@ void TextFile_RemoveChar_Right(void)
     DArray_remove(textFile->cursor.line, cursor_pos);
 }
 
+void TextFile_UpdateCursorSelect(void)
+{
+    if (IsKeyDown(KEY_LEFT_SHIFT))
+        if (editor.currentTextFile.cursor_start_select.line == NULL)
+        {
+            editor.currentTextFile.cursor_start_select.line = editor.currentTextFile.cursor.line;
+            editor.currentTextFile.cursor_start_select.line_num = editor.currentTextFile.cursor.line_num;
+            editor.currentTextFile.cursor_start_select.position = editor.currentTextFile.cursor.position;
+        }
+        else
+        {
+            DArray_clear(&editor.currentTextFile.cursor_select);
+            if (editor.currentTextFile.cursor.position >= editor.currentTextFile.cursor_start_select.position)
+                DArray_append_many(&editor.currentTextFile.cursor_select, &editor.currentTextFile.cursor_start_select.line->items[editor.currentTextFile.cursor_start_select.position], editor.currentTextFile.cursor.position - editor.currentTextFile.cursor_start_select.position);
+            else
+                DArray_append_many(&editor.currentTextFile.cursor_select, &editor.currentTextFile.cursor_start_select.line->items[editor.currentTextFile.cursor.position], editor.currentTextFile.cursor_start_select.position - editor.currentTextFile.cursor.position);
+        }
+    else
+        editor.currentTextFile.cursor_start_select.line = NULL;
+}
+
 void TextFile_MoveCursor(void)
 {
     TextFile *textFile = &editor.currentTextFile;
     switch (editor.key_pressed)
     {
     case KEY_RIGHT:
-
+    case KEY_LEFT:
+    case KEY_UP:
+    case KEY_DOWN:
+        TextFile_UpdateCursorSelect();
+    }
+    switch (editor.key_pressed)
+    {
+    case KEY_RIGHT:
         textFile->cursor.position++;
         if (textFile->cursor.position > textFile->cursor.line->count)
         {
@@ -277,6 +308,15 @@ void TextFile_MoveCursor(void)
     if (textFile->cursor.position > textFile->cursor.line->count)
         textFile->cursor.position = textFile->cursor.line->count;
     // DEBUG("cursor_pos %ld str_size %ld line %ld char %c", textFile->cursor.position, textFile->cursor.line->count, textFile->cursor.line_num, textFile->cursor.line->items[textFile->cursor.line->count - 1]);
+
+    switch (editor.key_pressed)
+    {
+    case KEY_RIGHT:
+    case KEY_LEFT:
+    case KEY_UP:
+    case KEY_DOWN:
+        TextFile_UpdateCursorSelect();
+    }
 }
 
 Vector2 TextFile_GetCursorPosition(void)
@@ -419,4 +459,24 @@ void TextFile_Draw(void)
     DrawLineEx((Vector2){-4, 0}, (Vector2){-4, final_num_pos}, 1, GRAY);
     // Draw cursor
     DrawRectangleV(editor.cursor_pos, (Vector2){2, editor.font_size}, WHITE);
+    // DEBUG("%s", editor.currentTextFile.cursor_select.items);
+    // Draw select text
+    DArray_char aux = {0};
+
+    Vector2 str_line_start_select;
+    if (editor.currentTextFile.cursor_start_select.line != NULL)
+    {
+        if (editor.currentTextFile.cursor.position >= editor.currentTextFile.cursor_start_select.position)
+            DArray_append_many(&aux, editor.currentTextFile.cursor_start_select.line, editor.currentTextFile.cursor_start_select.position);
+        // DArray_append_many(&editor.currentTextFile.cursor_select, &editor.currentTextFile.cursor_start_select.line->items[editor.currentTextFile.cursor_start_select.position], editor.currentTextFile.cursor.position - editor.currentTextFile.cursor_start_select.position);
+        else
+            DArray_append_many(&aux, editor.currentTextFile.cursor_start_select.line, editor.currentTextFile.cursor.position);
+        // DArray_append_many(&editor.currentTextFile.cursor_select, &editor.currentTextFile.cursor_start_select.line->items[editor.currentTextFile.cursor.position], editor.currentTextFile.cursor_start_select.position - editor.currentTextFile.cursor.position);
+
+        // DArray_append_many(&aux, editor.currentTextFile.cursor_start_select.line, )
+        str_line_start_select = MeasureTextEx(editor.font, aux.items, editor.font_size, editor.font_spacing);
+        str_line_number_size = MeasureTextEx(editor.font, editor.currentTextFile.cursor_select.items, editor.font_size, editor.font_spacing);
+        DrawRectangleV((Vector2){str_line_start_select.x, editor.currentTextFile.cursor_start_select.line_num * editor.font_size}, str_line_number_size, (Color){100, 100, 100, 100});
+    }
+    DArray_free(&aux);
 }
