@@ -27,20 +27,20 @@ typedef struct TextFile
 
 TextFile TextFile_Load(const DArray_char *file_name);
 TextFile TextFile_LoadEmpty(void);
-void TextFile_Free(void);
-void TextFile_Save(void);
+void TextFile_Free(TextFile *textFile);
+void TextFile_Save(TextFile *textFile);
 
-void TextFile_Print(void);
+void TextFile_Print(TextFile *textFile);
 
-void TextFile_InsertChar(void);
-void TextFile_RemoveChar(void);
-void TextFile_InsertNewLine(void);
-void TextFile_RemovePreLine(void);
+void TextFile_InsertChar(TextFile *textFile, char c);
+void TextFile_RemoveChar(TextFile *textFile);
+void TextFile_InsertNewLine(TextFile *textFile);
+void TextFile_RemovePreLine(TextFile *textFile);
 
-void TextFile_MoveCursor(void);
-Vector2 TextFile_GetCursorPosition(void);
+void TextFile_MoveCursor(TextFile *textFile, KeyboardKey key_pressed);
+Vector2 TextFile_GetCursorPosition(TextFile *textFile, Font font, int font_size, int font_spacing);
 
-void TextFile_Logic(void);
-void TextFile_Draw(void);
+void TextFile_Logic(Editor *editor);
+void TextFile_Draw(Editor *editor);
 
 #endif // TextFile_H

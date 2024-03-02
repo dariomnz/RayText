@@ -15,10 +15,10 @@ typedef struct Directory
 
 #include "Editor.h"
 
-void Directory_Load(DArray_char *dir_name);
+void Directory_Load(Directory *directory, DArray_char *dir_name);
 
-void Directory_Logic(void);
-void Directory_Draw(void);
-void Directory_Free(void);
+void Directory_Logic(Editor *editor);
+void Directory_Draw(Editor *editor);
+void Directory_Free(Directory *directory);
 
 #endif // Directory_H

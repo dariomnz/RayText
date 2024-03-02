@@ -1,8 +1,6 @@
 #include "TextFile.h"
 #include "DArray.h"
 
-extern Editor editor;
-
 TextFile TextFile_Load(const DArray_char *file_name)
 {
     TextFile textFile = {0};
@@ -61,9 +59,8 @@ TextFile TextFile_LoadEmpty(void)
     return textFile;
 }
 
-DArray_char TextFile_to_string(void)
+DArray_char TextFile_to_string(TextFile *textFile)
 {
-    TextFile *textFile = &editor.currentTextFile;
     DArray_char data = {0};
     DArray_clear(&data);
     for (size_t i = 0; i < textFile->count; i++)
@@ -75,20 +72,18 @@ DArray_char TextFile_to_string(void)
     return data;
 }
 
-void TextFile_Save(void)
+void TextFile_Save(TextFile *textFile)
 {
-    TextFile *textFile = &editor.currentTextFile;
     DEBUG("Saving: %s", textFile->name.items);
-    DArray_char data = TextFile_to_string();
+    DArray_char data = TextFile_to_string(textFile);
 
     SaveFileText(textFile->name.items, data.items);
 
     DArray_free(&data);
 }
 
-void TextFile_Free(void)
+void TextFile_Free(TextFile *textFile)
 {
-    TextFile *textFile = &editor.currentTextFile;
     for (size_t i = 0; i < textFile->count; i++)
     {
         DArray_free(textFile->items[i]);
@@ -98,28 +93,24 @@ void TextFile_Free(void)
     DArray_free(textFile);
 }
 
-void TextFile_Print(void)
+void TextFile_Print(TextFile *textFile)
 {
-    TextFile *textFile = &editor.currentTextFile;
     printf("--------File \"%s\"--------\n", textFile->name.items);
 
-    DArray_char data = TextFile_to_string();
+    DArray_char data = TextFile_to_string(textFile);
     printf("%s\n", data.items);
     DArray_free(&data);
     printf("------End file \"%s\"------\n", textFile->name.items);
 }
 
-void TextFile_InsertChar(void)
+void TextFile_InsertChar(TextFile *textFile, char c)
 {
-    TextFile *textFile = &editor.currentTextFile;
-
-    DArray_insert(textFile->cursor.line, editor.char_pressed, textFile->cursor.position);
+    DArray_insert(textFile->cursor.line, c, textFile->cursor.position);
     textFile->cursor.position++;
 }
 
-void TextFile_InsertStr(const char *str)
+void TextFile_InsertStr(TextFile *textFile, const char *str)
 {
-    TextFile *textFile = &editor.currentTextFile;
     size_t str_size = strlen(str);
     size_t start = 0;
     size_t size = 0;
@@ -131,7 +122,7 @@ void TextFile_InsertStr(const char *str)
             size = i - start - 1;
             DArray_insert_many(textFile->cursor.line, &str[start], size, textFile->cursor.position);
             textFile->cursor.position += size;
-            TextFile_InsertNewLine();
+            TextFile_InsertNewLine(textFile);
             start = i + 1;
         }
     }
@@ -140,9 +131,8 @@ void TextFile_InsertStr(const char *str)
     textFile->cursor.position += size;
 }
 
-void TextFile_InsertNewLine(void)
+void TextFile_InsertNewLine(TextFile *textFile)
 {
-    TextFile *textFile = &editor.currentTextFile;
     size_t new_line_pos = textFile->cursor.line_num + 1;
     size_t new_line_chars = textFile->cursor.line->count - textFile->cursor.position;
 
@@ -168,9 +158,8 @@ void TextFile_InsertNewLine(void)
     textFile->cursor.position = 0;
 }
 
-void TextFile_RemoveLine_Left(void)
+void TextFile_RemoveLine_Left(TextFile *textFile)
 {
-    TextFile *textFile = &editor.currentTextFile;
     if (textFile->cursor.line_num == 0)
         return;
 
@@ -184,9 +173,8 @@ void TextFile_RemoveLine_Left(void)
     textFile->cursor.position = position_pre_line;
 }
 
-void TextFile_RemoveLine_Right(void)
+void TextFile_RemoveLine_Right(TextFile *textFile)
 {
-    TextFile *textFile = &editor.currentTextFile;
     if (textFile->cursor.line_num + 1 == textFile->count)
         return;
 
@@ -194,14 +182,12 @@ void TextFile_RemoveLine_Right(void)
     DArray_remove(textFile, textFile->cursor.line_num + 1);
 }
 
-void TextFile_RemoveChar_Left(void)
+void TextFile_RemoveChar_Left(TextFile *textFile)
 {
-    TextFile *textFile = &editor.currentTextFile;
-
     size_t cursor_pos = textFile->cursor.position;
     if (cursor_pos == 0)
     {
-        TextFile_RemoveLine_Left();
+        TextFile_RemoveLine_Left(textFile);
         return;
     }
 
@@ -211,59 +197,56 @@ void TextFile_RemoveChar_Left(void)
     textFile->cursor.position--;
 }
 
-void TextFile_RemoveChar_Right(void)
+void TextFile_RemoveChar_Right(TextFile *textFile)
 {
-    TextFile *textFile = &editor.currentTextFile;
-
     size_t cursor_pos = textFile->cursor.position;
     if (cursor_pos == textFile->cursor.line->count)
     {
-        TextFile_RemoveLine_Right();
+        TextFile_RemoveLine_Right(textFile);
         return;
     }
 
     DArray_remove(textFile->cursor.line, cursor_pos);
 }
 
-void TextFile_UpdateCursorSelect(void)
+void TextFile_UpdateCursorSelect(TextFile *textFile)
 {
     if (IsKeyDown(KEY_LEFT_SHIFT))
-        if (editor.currentTextFile.cursor_start_select.line == NULL)
+        if (textFile->cursor_start_select.line == NULL)
         {
-            editor.currentTextFile.cursor_start_select.line = editor.currentTextFile.cursor.line;
-            editor.currentTextFile.cursor_start_select.line_num = editor.currentTextFile.cursor.line_num;
-            editor.currentTextFile.cursor_start_select.position = editor.currentTextFile.cursor.position;
+            textFile->cursor_start_select.line = textFile->cursor.line;
+            textFile->cursor_start_select.line_num = textFile->cursor.line_num;
+            textFile->cursor_start_select.position = textFile->cursor.position;
         }
         else
         {
-            DArray_clear(&editor.currentTextFile.cursor_select);
-            if (editor.currentTextFile.cursor.position >= editor.currentTextFile.cursor_start_select.position)
-                DArray_append_many(&editor.currentTextFile.cursor_select, &editor.currentTextFile.cursor_start_select.line->items[editor.currentTextFile.cursor_start_select.position], editor.currentTextFile.cursor.position - editor.currentTextFile.cursor_start_select.position);
+            DArray_clear(&textFile->cursor_select);
+            if (textFile->cursor.position >= textFile->cursor_start_select.position)
+                DArray_append_many(&textFile->cursor_select, &textFile->cursor_start_select.line->items[textFile->cursor_start_select.position], textFile->cursor.position - textFile->cursor_start_select.position);
             else
-                DArray_append_many(&editor.currentTextFile.cursor_select, &editor.currentTextFile.cursor_start_select.line->items[editor.currentTextFile.cursor.position], editor.currentTextFile.cursor_start_select.position - editor.currentTextFile.cursor.position);
+                DArray_append_many(&textFile->cursor_select, &textFile->cursor_start_select.line->items[textFile->cursor.position], textFile->cursor_start_select.position - textFile->cursor.position);
         }
     else
-        editor.currentTextFile.cursor_start_select.line = NULL;
+        textFile->cursor_start_select.line = NULL;
 }
 
-void TextFile_MoveCursor(void)
+void TextFile_MoveCursor(TextFile *textFile, KeyboardKey key_pressed)
 {
-    TextFile *textFile = &editor.currentTextFile;
-    switch (editor.key_pressed)
+    switch (key_pressed)
     {
     case KEY_RIGHT:
     case KEY_LEFT:
     case KEY_UP:
     case KEY_DOWN:
-        TextFile_UpdateCursorSelect();
+        TextFile_UpdateCursorSelect(textFile);
     }
-    switch (editor.key_pressed)
+    switch (key_pressed)
     {
     case KEY_RIGHT:
         textFile->cursor.position++;
         if (textFile->cursor.position > textFile->cursor.line->count)
         {
-            editor.key_pressed = KEY_DOWN;
+            key_pressed = KEY_DOWN;
             if (textFile->cursor.line_num != textFile->count - 1)
                 textFile->cursor.position = 0;
         }
@@ -274,7 +257,7 @@ void TextFile_MoveCursor(void)
             textFile->cursor.position--;
         else
         {
-            editor.key_pressed = KEY_UP;
+            key_pressed = KEY_UP;
             if (textFile->cursor.line_num != 0)
                 textFile->cursor.position = __SIZE_MAX__ - 1;
         }
@@ -283,7 +266,7 @@ void TextFile_MoveCursor(void)
     default:
         break;
     }
-    switch (editor.key_pressed)
+    switch (key_pressed)
     {
     case KEY_UP:
         if (textFile->cursor.line_num != 0)
@@ -309,42 +292,41 @@ void TextFile_MoveCursor(void)
         textFile->cursor.position = textFile->cursor.line->count;
     // DEBUG("cursor_pos %ld str_size %ld line %ld char %c", textFile->cursor.position, textFile->cursor.line->count, textFile->cursor.line_num, textFile->cursor.line->items[textFile->cursor.line->count - 1]);
 
-    switch (editor.key_pressed)
+    switch (key_pressed)
     {
     case KEY_RIGHT:
     case KEY_LEFT:
     case KEY_UP:
     case KEY_DOWN:
-        TextFile_UpdateCursorSelect();
+        TextFile_UpdateCursorSelect(textFile);
     }
 }
 
-Vector2 TextFile_GetCursorPosition(void)
+Vector2 TextFile_GetCursorPosition(TextFile *textFile, Font font, int font_size, int font_spacing)
 {
-    TextFile *textFile = &editor.currentTextFile;
     size_t cursor_pos = textFile->cursor.position;
     if (textFile->cursor.line->count == 0)
     {
-        return (Vector2){0, editor.font_size * textFile->cursor.line_num};
+        return (Vector2){0, font_size * textFile->cursor.line_num};
     }
     char cursor_char = textFile->cursor.line->items[cursor_pos];
     textFile->cursor.line->items[cursor_pos] = '\0';
-    Vector2 cursor_vec_pos = MeasureTextEx(editor.font, textFile->cursor.line->items, editor.font_size, editor.font_spacing);
+    Vector2 cursor_vec_pos = MeasureTextEx(font, textFile->cursor.line->items, font_size, font_spacing);
     textFile->cursor.line->items[cursor_pos] = cursor_char;
-    cursor_vec_pos.y = editor.font_size * textFile->cursor.line_num;
+    cursor_vec_pos.y = font_size * textFile->cursor.line_num;
     return cursor_vec_pos;
 }
 
-void TextFile_CheckClickCursorPosition(void)
+void TextFile_CheckClickCursorPosition(Editor *editor)
 {
     if (!IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         return;
 
     Vector2 cursor_world_position = GetMousePosition();
-    cursor_world_position = GetScreenToWorld2D(cursor_world_position, editor.camera);
+    cursor_world_position = GetScreenToWorld2D(cursor_world_position, editor->camera);
 
-    int plus_minus_lines = (editor.screenHeight / editor.camera.zoom) / editor.font_size / 2;
-    int current_line = editor.currentTextFile.cursor.line_num;
+    int plus_minus_lines = (editor->screenHeight / editor->camera.zoom) / editor->font_size / 2;
+    int current_line = editor->currentTextFile.cursor.line_num;
     int i;
     Rectangle line_collision_box = {0};
     Vector2 line_size = {0};
@@ -352,20 +334,20 @@ void TextFile_CheckClickCursorPosition(void)
     {
         if (i < 0)
             continue;
-        if (i >= editor.currentTextFile.count)
+        if (i >= editor->currentTextFile.count)
             break;
-        line_collision_box.y = editor.font_size * i;
-        line_size = MeasureTextEx(editor.font, editor.currentTextFile.items[i]->items, editor.font_size, editor.font_spacing);
-        line_collision_box.width = line_size.x + editor.screenWidth;
-        line_collision_box.height = editor.font_size;
+        line_collision_box.y = editor->font_size * i;
+        line_size = MeasureTextEx(editor->font, editor->currentTextFile.items[i]->items, editor->font_size, editor->font_spacing);
+        line_collision_box.width = line_size.x + editor->screenWidth;
+        line_collision_box.height = editor->font_size;
         if (CheckCollisionPointRec(cursor_world_position, line_collision_box))
         {
             DArray_char aux = {0};
             size_t new_pos = __SIZE_MAX__ - 1;
-            for (size_t j = 0; j < editor.currentTextFile.items[i]->count; j++)
+            for (size_t j = 0; j < editor->currentTextFile.items[i]->count; j++)
             {
-                DArray_append(&aux, editor.currentTextFile.items[i]->items[j]);
-                line_size = MeasureTextEx(editor.font, aux.items, editor.font_size, editor.font_spacing);
+                DArray_append(&aux, editor->currentTextFile.items[i]->items[j]);
+                line_size = MeasureTextEx(editor->font, aux.items, editor->font_size, editor->font_spacing);
                 if (cursor_world_position.x < line_size.x)
                 {
                     new_pos = j;
@@ -373,71 +355,70 @@ void TextFile_CheckClickCursorPosition(void)
                 }
             }
 
-            editor.currentTextFile.cursor.line_num = i;
-            editor.currentTextFile.cursor.line = editor.currentTextFile.items[i];
-            editor.currentTextFile.cursor.position = new_pos;
+            editor->currentTextFile.cursor.line_num = i;
+            editor->currentTextFile.cursor.line = editor->currentTextFile.items[i];
+            editor->currentTextFile.cursor.position = new_pos;
             DArray_free(&aux);
             break;
         }
     }
 }
 
-void TextFile_Logic(void)
+void TextFile_Logic(Editor *editor)
 {
-    if (editor.editor_state != STATE_TEXTFILE)
+    if (editor->editor_state != STATE_TEXTFILE)
         return;
 
-    TextFile_MoveCursor();
-    editor.cursor_pos = TextFile_GetCursorPosition();
+    TextFile_MoveCursor(&editor->currentTextFile, editor->key_pressed);
+    editor->cursor_pos = TextFile_GetCursorPosition(&editor->currentTextFile, editor->font, editor->font_size, editor->font_spacing);
 
-    TextFile_CheckClickCursorPosition();
+    TextFile_CheckClickCursorPosition(editor);
 
-    if (editor.key_pressed == KEY_BACKSPACE)
-        TextFile_RemoveChar_Left();
+    if (editor->key_pressed == KEY_BACKSPACE)
+        TextFile_RemoveChar_Left(&editor->currentTextFile);
 
-    if (editor.key_pressed == KEY_DELETE)
-        TextFile_RemoveChar_Right();
+    if (editor->key_pressed == KEY_DELETE)
+        TextFile_RemoveChar_Right(&editor->currentTextFile);
 
-    if (editor.char_pressed != 0)
-        TextFile_InsertChar();
+    if (editor->char_pressed != 0)
+        TextFile_InsertChar(&editor->currentTextFile, editor->char_pressed);
 
-    if (editor.key_pressed == KEY_TAB)
+    if (editor->key_pressed == KEY_TAB)
     {
-        editor.char_pressed = ' ';
         for (int i = 0; i < 4; i++)
-            TextFile_InsertChar();
+            TextFile_InsertChar(&editor->currentTextFile, ' ');
     }
 
-    if (editor.key_pressed == KEY_ENTER)
-        TextFile_InsertNewLine();
+    if (editor->key_pressed == KEY_ENTER)
+        TextFile_InsertNewLine(&editor->currentTextFile);
 
     if (IsKeyDown(KEY_LEFT_CONTROL))
     {
         if (IsKeyPressed(KEY_S))
         {
-            TextFile_Save();
+            TextFile_Save(&editor->currentTextFile);
         }
 
         if (IsKeyPressed(KEY_C))
         {
             // TODO: now only copy the entire line
-            SetClipboardText(editor.currentTextFile.cursor.line->items);
+            SetClipboardText(editor->currentTextFile.cursor.line->items);
         }
 
         if (IsKeyPressed(KEY_V))
         {
-            TextFile_InsertStr(GetClipboardText());
+            TextFile_InsertStr(&editor->currentTextFile, GetClipboardText());
         }
     }
 }
 
-void TextFile_Draw(void)
+void TextFile_Draw(Editor *editor)
 {
-    if (editor.editor_state != STATE_TEXTFILE && editor.editor_state != STATE_COMMAND)
+    if (editor->editor_state != STATE_TEXTFILE && editor->editor_state != STATE_COMMAND)
         return;
 
-    int plus_minus_lines = (editor.screenHeight / editor.camera.zoom) / editor.font_size / 2 * 1.5f;
-    int current_line = editor.currentTextFile.cursor.line_num;
+    int plus_minus_lines = (editor->screenHeight / editor->camera.zoom) / editor->font_size / 2 * 1.5f;
+    int current_line = editor->currentTextFile.cursor.line_num;
     int i;
     char str_line_number[10];
     Vector2 str_line_number_size;
@@ -445,38 +426,38 @@ void TextFile_Draw(void)
     {
         if (i < 0)
             continue;
-        if (i >= editor.currentTextFile.count)
+        if (i >= editor->currentTextFile.count)
             break;
         // Draw text
-        DrawTextEx(editor.font, editor.currentTextFile.items[i]->items, (Vector2){0, editor.font_size * i}, editor.font_size, editor.font_spacing, WHITE);
+        DrawTextEx(editor->font, editor->currentTextFile.items[i]->items, (Vector2){0, editor->font_size * i}, editor->font_size, editor->font_spacing, WHITE);
         // Draw line number
         sprintf(str_line_number, "%d ", i + 1);
-        str_line_number_size = MeasureTextEx(editor.font, str_line_number, editor.font_size, editor.font_spacing);
-        DrawTextEx(editor.font, str_line_number, (Vector2){-str_line_number_size.x, editor.font_size * i}, editor.font_size, editor.font_spacing, GRAY);
+        str_line_number_size = MeasureTextEx(editor->font, str_line_number, editor->font_size, editor->font_spacing);
+        DrawTextEx(editor->font, str_line_number, (Vector2){-str_line_number_size.x, editor->font_size * i}, editor->font_size, editor->font_spacing, GRAY);
     }
     // Draw line separator numbers
-    int final_num_pos = editor.font_size * i;
+    int final_num_pos = editor->font_size * i;
     DrawLineEx((Vector2){-4, 0}, (Vector2){-4, final_num_pos}, 1, GRAY);
     // Draw cursor
-    DrawRectangleV(editor.cursor_pos, (Vector2){2, editor.font_size}, WHITE);
-    // DEBUG("%s", editor.currentTextFile.cursor_select.items);
+    DrawRectangleV(editor->cursor_pos, (Vector2){2, editor->font_size}, WHITE);
+    // DEBUG("%s", editor->currentTextFile.cursor_select.items);
     // Draw select text
     DArray_char aux = {0};
 
     Vector2 str_line_start_select;
-    if (editor.currentTextFile.cursor_start_select.line != NULL)
+    if (editor->currentTextFile.cursor_start_select.line != NULL)
     {
-        if (editor.currentTextFile.cursor.position >= editor.currentTextFile.cursor_start_select.position)
-            DArray_append_many(&aux, editor.currentTextFile.cursor_start_select.line, editor.currentTextFile.cursor_start_select.position);
-        // DArray_append_many(&editor.currentTextFile.cursor_select, &editor.currentTextFile.cursor_start_select.line->items[editor.currentTextFile.cursor_start_select.position], editor.currentTextFile.cursor.position - editor.currentTextFile.cursor_start_select.position);
+        if (editor->currentTextFile.cursor.position >= editor->currentTextFile.cursor_start_select.position)
+            DArray_append_many(&aux, editor->currentTextFile.cursor_start_select.line, editor->currentTextFile.cursor_start_select.position);
+        // DArray_append_many(&editor->currentTextFile.cursor_select, &editor->currentTextFile.cursor_start_select.line->items[editor->currentTextFile.cursor_start_select.position], editor->currentTextFile.cursor.position - editor->currentTextFile.cursor_start_select.position);
         else
-            DArray_append_many(&aux, editor.currentTextFile.cursor_start_select.line, editor.currentTextFile.cursor.position);
-        // DArray_append_many(&editor.currentTextFile.cursor_select, &editor.currentTextFile.cursor_start_select.line->items[editor.currentTextFile.cursor.position], editor.currentTextFile.cursor_start_select.position - editor.currentTextFile.cursor.position);
+            DArray_append_many(&aux, editor->currentTextFile.cursor_start_select.line, editor->currentTextFile.cursor.position);
+        // DArray_append_many(&editor->currentTextFile.cursor_select, &editor->currentTextFile.cursor_start_select.line->items[editor->currentTextFile.cursor.position], editor->currentTextFile.cursor_start_select.position - editor->currentTextFile.cursor.position);
 
-        // DArray_append_many(&aux, editor.currentTextFile.cursor_start_select.line, )
-        str_line_start_select = MeasureTextEx(editor.font, aux.items, editor.font_size, editor.font_spacing);
-        str_line_number_size = MeasureTextEx(editor.font, editor.currentTextFile.cursor_select.items, editor.font_size, editor.font_spacing);
-        DrawRectangleV((Vector2){str_line_start_select.x, editor.currentTextFile.cursor_start_select.line_num * editor.font_size}, str_line_number_size, (Color){100, 100, 100, 100});
+        // DArray_append_many(&aux, editor->currentTextFile.cursor_start_select.line, )
+        str_line_start_select = MeasureTextEx(editor->font, aux.items, editor->font_size, editor->font_spacing);
+        str_line_number_size = MeasureTextEx(editor->font, editor->currentTextFile.cursor_select.items, editor->font_size, editor->font_spacing);
+        DrawRectangleV((Vector2){str_line_start_select.x, editor->currentTextFile.cursor_start_select.line_num * editor->font_size}, str_line_number_size, (Color){100, 100, 100, 100});
     }
     DArray_free(&aux);
 }
