@@ -64,15 +64,15 @@ TextFile TextFile_LoadEmpty(void)
 DArray_char TextFile_to_string(void)
 {
     TextFile *textFile = &editor.currentTextFile;
-    // DArray_char data = {0};
-    DArray_clear(&all_file_string);
+    DArray_char data = {0};
+    DArray_clear(&data);
     for (size_t i = 0; i < textFile->count; i++)
     {
-        DArray_append_many(&all_file_string, textFile->items[i]->items, textFile->items[i]->count);
+        DArray_append_many(&data, textFile->items[i]->items, textFile->items[i]->count);
         if (i != textFile->count - 1)
-            DArray_append(&all_file_string, '\n');
+            DArray_append(&data, '\n');
     }
-    return all_file_string;
+    return data;
 }
 
 void TextFile_Save(void)
