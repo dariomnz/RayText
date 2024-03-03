@@ -9,10 +9,12 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
+    SetTargetFPS(60);
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    
     Editor editor = {0};
     Editor_Init(&editor);
 
-    // SetTargetFPS(60);
 
     // Main game loop
     while (!WindowShouldClose() && !editor.the_end) // Detect window close button or ESC key

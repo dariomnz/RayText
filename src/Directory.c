@@ -131,7 +131,7 @@ void Directory_Logic(Editor *editor)
         DArray_free(&aux);
     }
 
-    editor->cursor_pos = (Vector2){0, editor->currentDirectory.selected * editor->font_size};
+    editor->cursor_pos = (Vector2){0, editor->currentDirectory.selected * FONT_SIZE};
 }
 
 void Directory_Draw(Editor *editor)
@@ -150,13 +150,13 @@ void Directory_Draw(Editor *editor)
             color = WHITE;
         else
             color = BLUE;
-        Vector2 pos = (Vector2){0, editor->font_size * a};
+        Vector2 pos = (Vector2){0, FONT_SIZE * a};
         if (a == editor->currentDirectory.selected)
         {
-            Vector2 back_size = MeasureTextEx(editor->font, editor->currentDirectory.items[a]->items, editor->font_size, editor->font_spacing);
+            Vector2 back_size = MeasureTextEx(editor->font, editor->currentDirectory.items[a]->items, FONT_SIZE, FONT_SPACING);
             DrawRectangleV(pos, back_size, DARKGRAY);
         }
-        DrawTextEx(editor->font, editor->currentDirectory.items[a]->items, pos, editor->font_size, editor->font_spacing, color);
+        DrawTextEx(editor->font, editor->currentDirectory.items[a]->items, pos, FONT_SIZE, FONT_SPACING, color);
         DArray_clear(&aux);
     }
     DArray_free(&aux);

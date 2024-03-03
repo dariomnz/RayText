@@ -25,8 +25,6 @@ struct Editor
     DArray_char currentCommand;
     Directory currentDirectory;
     Font font;
-    int font_size;
-    int font_spacing;
     Camera2D camera;
     float zoom;
     Vector2 cursor_pos;

@@ -302,18 +302,18 @@ void TextFile_MoveCursor(TextFile *textFile, KeyboardKey key_pressed)
     }
 }
 
-Vector2 TextFile_GetCursorPosition(TextFile *textFile, Font font, int font_size, int font_spacing)
+Vector2 TextFile_GetCursorPosition(TextFile *textFile, Font font)
 {
     size_t cursor_pos = textFile->cursor.position;
     if (textFile->cursor.line->count == 0)
     {
-        return (Vector2){0, font_size * textFile->cursor.line_num};
+        return (Vector2){0, FONT_SIZE * textFile->cursor.line_num};
     }
     char cursor_char = textFile->cursor.line->items[cursor_pos];
     textFile->cursor.line->items[cursor_pos] = '\0';
-    Vector2 cursor_vec_pos = MeasureTextEx(font, textFile->cursor.line->items, font_size, font_spacing);
+    Vector2 cursor_vec_pos = MeasureTextEx(font, textFile->cursor.line->items, FONT_SIZE, FONT_SPACING);
     textFile->cursor.line->items[cursor_pos] = cursor_char;
-    cursor_vec_pos.y = font_size * textFile->cursor.line_num;
+    cursor_vec_pos.y = FONT_SIZE * textFile->cursor.line_num;
     return cursor_vec_pos;
 }
 
@@ -325,7 +325,7 @@ void TextFile_CheckClickCursorPosition(Editor *editor)
     Vector2 cursor_world_position = GetMousePosition();
     cursor_world_position = GetScreenToWorld2D(cursor_world_position, editor->camera);
 
-    int plus_minus_lines = (editor->screenHeight / editor->camera.zoom) / editor->font_size / 2;
+    int plus_minus_lines = (editor->screenHeight / editor->camera.zoom) / FONT_SIZE / 2;
     int current_line = editor->currentTextFile.cursor.line_num;
     int i;
     Rectangle line_collision_box = {0};
@@ -336,10 +336,10 @@ void TextFile_CheckClickCursorPosition(Editor *editor)
             continue;
         if (i >= editor->currentTextFile.count)
             break;
-        line_collision_box.y = editor->font_size * i;
-        line_size = MeasureTextEx(editor->font, editor->currentTextFile.items[i]->items, editor->font_size, editor->font_spacing);
+        line_collision_box.y = FONT_SIZE * i;
+        line_size = MeasureTextEx(editor->font, editor->currentTextFile.items[i]->items, FONT_SIZE, FONT_SPACING);
         line_collision_box.width = line_size.x + editor->screenWidth;
-        line_collision_box.height = editor->font_size;
+        line_collision_box.height = FONT_SIZE;
         if (CheckCollisionPointRec(cursor_world_position, line_collision_box))
         {
             DArray_char aux = {0};
@@ -347,7 +347,7 @@ void TextFile_CheckClickCursorPosition(Editor *editor)
             for (size_t j = 0; j < editor->currentTextFile.items[i]->count; j++)
             {
                 DArray_append(&aux, editor->currentTextFile.items[i]->items[j]);
-                line_size = MeasureTextEx(editor->font, aux.items, editor->font_size, editor->font_spacing);
+                line_size = MeasureTextEx(editor->font, aux.items, FONT_SIZE, FONT_SPACING);
                 if (cursor_world_position.x < line_size.x)
                 {
                     new_pos = j;
@@ -370,7 +370,7 @@ void TextFile_Logic(Editor *editor)
         return;
 
     TextFile_MoveCursor(&editor->currentTextFile, editor->key_pressed);
-    editor->cursor_pos = TextFile_GetCursorPosition(&editor->currentTextFile, editor->font, editor->font_size, editor->font_spacing);
+    editor->cursor_pos = TextFile_GetCursorPosition(&editor->currentTextFile, editor->font);
 
     TextFile_CheckClickCursorPosition(editor);
 
@@ -417,7 +417,7 @@ void TextFile_Draw(Editor *editor)
     if (editor->editor_state != STATE_TEXTFILE && editor->editor_state != STATE_COMMAND)
         return;
 
-    int plus_minus_lines = (editor->screenHeight / editor->camera.zoom) / editor->font_size / 2 * 1.5f;
+    int plus_minus_lines = (editor->screenHeight / editor->camera.zoom) / FONT_SIZE / 2 * 1.5f;
     int current_line = editor->currentTextFile.cursor.line_num;
     int i;
     char str_line_number[10];
@@ -429,17 +429,17 @@ void TextFile_Draw(Editor *editor)
         if (i >= editor->currentTextFile.count)
             break;
         // Draw text
-        DrawTextEx(editor->font, editor->currentTextFile.items[i]->items, (Vector2){0, editor->font_size * i}, editor->font_size, editor->font_spacing, WHITE);
+        DrawTextEx(editor->font, editor->currentTextFile.items[i]->items, (Vector2){0, FONT_SIZE * i}, FONT_SIZE, FONT_SPACING, WHITE);
         // Draw line number
         sprintf(str_line_number, "%d ", i + 1);
-        str_line_number_size = MeasureTextEx(editor->font, str_line_number, editor->font_size, editor->font_spacing);
-        DrawTextEx(editor->font, str_line_number, (Vector2){-str_line_number_size.x, editor->font_size * i}, editor->font_size, editor->font_spacing, GRAY);
+        str_line_number_size = MeasureTextEx(editor->font, str_line_number, FONT_SIZE, FONT_SPACING);
+        DrawTextEx(editor->font, str_line_number, (Vector2){-str_line_number_size.x, FONT_SIZE * i}, FONT_SIZE, FONT_SPACING, GRAY);
     }
     // Draw line separator numbers
-    int final_num_pos = editor->font_size * i;
+    int final_num_pos = FONT_SIZE * i;
     DrawLineEx((Vector2){-4, 0}, (Vector2){-4, final_num_pos}, 1, GRAY);
     // Draw cursor
-    DrawRectangleV(editor->cursor_pos, (Vector2){2, editor->font_size}, WHITE);
+    DrawRectangleV(editor->cursor_pos, (Vector2){2, FONT_SIZE}, WHITE);
     // DEBUG("%s", editor->currentTextFile.cursor_select.items);
     // Draw select text
     DArray_char aux = {0};
@@ -455,9 +455,9 @@ void TextFile_Draw(Editor *editor)
         // DArray_append_many(&editor->currentTextFile.cursor_select, &editor->currentTextFile.cursor_start_select.line->items[editor->currentTextFile.cursor.position], editor->currentTextFile.cursor_start_select.position - editor->currentTextFile.cursor.position);
 
         // DArray_append_many(&aux, editor->currentTextFile.cursor_start_select.line, )
-        str_line_start_select = MeasureTextEx(editor->font, aux.items, editor->font_size, editor->font_spacing);
-        str_line_number_size = MeasureTextEx(editor->font, editor->currentTextFile.cursor_select.items, editor->font_size, editor->font_spacing);
-        DrawRectangleV((Vector2){str_line_start_select.x, editor->currentTextFile.cursor_start_select.line_num * editor->font_size}, str_line_number_size, (Color){100, 100, 100, 100});
+        str_line_start_select = MeasureTextEx(editor->font, aux.items, FONT_SIZE, FONT_SPACING);
+        str_line_number_size = MeasureTextEx(editor->font, editor->currentTextFile.cursor_select.items, FONT_SIZE, FONT_SPACING);
+        DrawRectangleV((Vector2){str_line_start_select.x, editor->currentTextFile.cursor_start_select.line_num * FONT_SIZE}, str_line_number_size, (Color){100, 100, 100, 100});
     }
     DArray_free(&aux);
 }

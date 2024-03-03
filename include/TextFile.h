@@ -38,7 +38,7 @@ void TextFile_InsertNewLine(TextFile *textFile);
 void TextFile_RemovePreLine(TextFile *textFile);
 
 void TextFile_MoveCursor(TextFile *textFile, KeyboardKey key_pressed);
-Vector2 TextFile_GetCursorPosition(TextFile *textFile, Font font, int font_size, int font_spacing);
+Vector2 TextFile_GetCursorPosition(TextFile *textFile, Font font);
 
 void TextFile_Logic(Editor *editor);
 void TextFile_Draw(Editor *editor);

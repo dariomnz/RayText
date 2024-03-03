@@ -14,6 +14,9 @@
 #define PATH_SEPARATOR "/"
 #endif
 
+#define FONT_SIZE 20
+#define FONT_SPACING 0
+
 #define DEBUG(fmt, ...) fprintf(stderr, "[%s:%d] %s(): " fmt "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__)
 
 /**

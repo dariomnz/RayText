@@ -133,6 +133,7 @@ typedef struct DArray_char
         (da)->count = 0;                                            \
     } while (0)
 
+// Free memory of DArray
 #define DArray_free(da)            \
     do                             \
     {                              \

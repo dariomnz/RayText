@@ -23,8 +23,6 @@ void Editor_Init(Editor *editor)
 
     editor->font = LoadFontEx("." PATH_SEPARATOR "resources" PATH_SEPARATOR "fonts" PATH_SEPARATOR "Monaco.ttf", 82, 0, 0);
     SetTextureFilter(editor->font.texture, TEXTURE_FILTER_BILINEAR);
-    editor->font_size = 20;
-    editor->font_spacing = 0;
     memset(&editor->currentCommand, 0, sizeof(DArray_char));
     editor->currentTextFile = TextFile_LoadEmpty();
     memset(&editor->currentDirectory, 0, sizeof(Directory));
