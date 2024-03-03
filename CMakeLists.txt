@@ -8,9 +8,11 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
 
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        set(RAYLIB_DIR ${CMAKE_SOURCE_DIR}/raylib/raylib-5.0_linux_amd64)
+        set(RAYLIB_LIBRARY ${CMAKE_SOURCE_DIR}/raylib/raylib-5.0_linux_amd64/lib/libraylib.so)
+        include_directories(${CMAKE_SOURCE_DIR}/raylib/raylib-5.0_linux_amd64/include)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-        set(RAYLIB_DIR ${CMAKE_SOURCE_DIR}/raylib/raylib-5.0_win64_mingw-w64)
+        set(RAYLIB_LIBRARY ${CMAKE_SOURCE_DIR}/raylib/raylib-5.0_win64_mingw-w64/lib/libraylib.so)
+        include_directories(${CMAKE_SOURCE_DIR}/raylib/raylib-5.0_win64_mingw-w64/include)
 else()
     message(FATAL_ERROR "Operating system not supported: ${CMAKE_SYSTEM_NAME}")
 endif()
@@ -25,8 +27,6 @@ file(GLOB all_SRCS
 	"${PROJECT_SOURCE_DIR}/src/*.c"
         )
 
-include_directories(${RAYLIB_DIR}/include)
-find_library(RAYLIB_LIBRARY raylib HINTS ${RAYLIB_DIR}/lib)
 
 add_executable(${PROJECT_NAME} ${all_SRCS})
 
