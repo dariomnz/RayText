@@ -2,7 +2,6 @@
 #define Command_H
 
 #include "Common.h"
-#include "Directory.h"
 #include "Editor.h"
 
 void Command_InsertChar(DArray_char *command, char c);

@@ -58,6 +58,7 @@ void Editor_Logic(Editor *editor)
     TextFile_Logic(editor);
     Command_Logic(editor);
     Directory_Logic(editor);
+    Cursor_Logic(editor);
 
     // Zoom based on mouse wheel
     float wheel = GetMouseWheelMove();
@@ -83,15 +84,12 @@ void Editor_Draw(Editor *editor)
 
     BeginMode2D(editor->camera);
 
-    // Draw text file
     TextFile_Draw(editor);
-
-    // Draw dir
     Directory_Draw(editor);
+    Cursor_Draw(editor);
 
     EndMode2D();
 
-    // Draw menu
     Command_Draw(editor);
 
     DrawFPS(0, 0);
