@@ -27,15 +27,22 @@ typedef struct TextFile
     DArray_char name;           // Name of file
 } TextFile;
 
-
 typedef struct Directory
 {
-    DArray_char **items; // DArray items for store names
-    size_t count;        // DArray count
-    size_t capacity;     // DArray capacity
-    DArray_char name;    // Name of dir
-    int selected;        // Selected dirent
+    char *items;     // DArray items for store names
+    size_t count;    // DArray count
+    size_t capacity; // DArray capacity
+    bool is_file;    // Selected dirent
 } Directory;
+
+typedef struct Directories
+{
+    Directory **items; // DArray items for store Directory
+    size_t count;      // DArray count
+    size_t capacity;   // DArray capacity
+    DArray_char name;  // Name of dir
+    int selected;      // Selected Directory
+} Directories;
 
 typedef enum
 {
@@ -51,7 +58,7 @@ typedef struct Editor
     int screenHeight;
     TextFile currentTextFile;
     DArray_char currentCommand;
-    Directory currentDirectory;
+    Directories currentDirectory;
     Font font;
     Camera2D camera;
     float zoom;
@@ -62,6 +69,6 @@ typedef struct Editor
 
     Editor_state editor_state;
     bool the_end;
-}Editor;
+} Editor;
 
 #endif // Structs_H

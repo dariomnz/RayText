@@ -57,9 +57,9 @@ void Command_Consume(Editor *editor)
         }
         else if (strstart(editor->currentCommand.items, ">dir"))
         {
-            DArray_char aux = {0};
+            Directory aux = {0};
             DArray_append_many(&aux, &editor->currentCommand.items[4], editor->currentCommand.count - 4);
-            trimwhitespace(&aux);
+            trimwhitespace((DArray_char *)&aux);
             DEBUG(">dir Name of dir: %s", aux.items);
             Directory_Load(&editor->currentDirectory, &aux);
             editor->editor_state = STATE_DIRECTORY;

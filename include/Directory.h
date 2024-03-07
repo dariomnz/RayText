@@ -6,10 +6,10 @@
 #include "Structs.h"
 #include "Editor.h"
 
-void Directory_Load(Directory *directory, DArray_char *dir_name);
+void Directory_Load(Directories *directories, Directory *dir_name);
 
 void Directory_Logic(Editor *editor);
 void Directory_Draw(Editor *editor);
-void Directory_Free(Directory *directory);
+void Directory_Free(Directories *directories);
 
 #endif // Directory_H
