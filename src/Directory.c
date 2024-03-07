@@ -101,20 +101,6 @@ void Directory_Logic(Editor *editor)
     if (editor->editor_state != STATE_DIRECTORY)
         return;
 
-    if (editor->key_pressed == KEY_DOWN)
-    {
-        if (editor->currentDirectory.selected + 1 < editor->currentDirectory.count)
-        {
-            editor->currentDirectory.selected++;
-        }
-    }
-    if (editor->key_pressed == KEY_UP)
-    {
-        if (editor->currentDirectory.selected != 0)
-        {
-            editor->currentDirectory.selected--;
-        }
-    }
     if (editor->key_pressed == KEY_ENTER)
     {
         DArray_char aux = {0};
