@@ -10,10 +10,16 @@
 
 typedef struct Cursor
 {
-    DArray_char *line; // Pointer to line
-    size_t line_num;   // Numero de la linea
-    size_t position;   // Position in line
+    int line_num;    // Numero de la linea
+    size_t position; // Position in line
 } Cursor;
+
+typedef struct DArray_rectangle
+{
+    Rectangle *items;     // Array of elements can have any type
+    size_t count;    // Count of current elements
+    size_t capacity; // Capacity of current items in memory
+} DArray_rectangle;
 
 typedef struct TextFile
 {
@@ -21,10 +27,11 @@ typedef struct TextFile
     size_t count;        // Darray count
     size_t capacity;     // Darray capacity
 
-    Cursor cursor_start_select; // Cursor start select
-    DArray_char cursor_select;  // Cursor select text
-    Cursor cursor;              // Cursor
-    DArray_char name;           // Name of file
+    Cursor cursor_start_select;   // Cursor start select
+    DArray_char cursor_select;    // Cursor select text
+    DArray_rectangle rect_select; // Darray of rects
+    Cursor cursor;                // Cursor
+    DArray_char name;             // Name of file
 } TextFile;
 
 typedef struct Directory

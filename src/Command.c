@@ -76,7 +76,6 @@ void Command_Consume(Editor *editor)
             if (val - 1 < editor->currentTextFile.count && val > 0)
             {
                 editor->currentTextFile.cursor.line_num = val - 1;
-                editor->currentTextFile.cursor.line = editor->currentTextFile.items[val - 1];
                 editor->currentTextFile.cursor.position = 0;
             }
         }

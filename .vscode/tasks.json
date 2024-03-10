@@ -14,7 +14,7 @@
         {
 			"label": "Build RayText Windows",
             "type": "shell",
-            "command": "build.bat",
+            "command": ".\\build.bat",
             "args": [],
             "group": {
                 "kind": "build",

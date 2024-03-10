@@ -28,8 +28,9 @@ TextFile TextFile_Load(const DArray_char *file_name)
     UnloadFileText(data);
 
     textFile.cursor.position = 0;
-    textFile.cursor.line = textFile.items[0];
     textFile.cursor.line_num = 0;
+
+    textFile.cursor_start_select.line_num = -1;
 
     return textFile;
 }
@@ -51,10 +52,9 @@ TextFile TextFile_LoadEmpty(void)
 
     // Init Cursor
     textFile.cursor.position = 0;
-    textFile.cursor.line = textFile.items[0];
     textFile.cursor.line_num = 0;
 
-    textFile.cursor_start_select.line = NULL;
+    textFile.cursor_start_select.line_num = -1;
 
     return textFile;
 }
@@ -89,7 +89,8 @@ void TextFile_Free(TextFile *textFile)
         DArray_free(textFile->items[i]);
         free(textFile->items[i]);
     }
-
+    DArray_free(&textFile->cursor_select);
+    DArray_free(&textFile->rect_select);
     DArray_free(textFile);
 }
 
@@ -105,7 +106,7 @@ void TextFile_Print(TextFile *textFile)
 
 void TextFile_InsertChar(TextFile *textFile, char c)
 {
-    DArray_insert(textFile->cursor.line, c, textFile->cursor.position);
+    DArray_insert(Cursor_GetLine(textFile, &textFile->cursor), c, textFile->cursor.position);
     textFile->cursor.position++;
 }
 
@@ -120,21 +121,21 @@ void TextFile_InsertStr(TextFile *textFile, const char *str)
         if (str[i] == '\n')
         {
             size = i - start - 1;
-            DArray_insert_many(textFile->cursor.line, &str[start], size, textFile->cursor.position);
+            DArray_insert_many(Cursor_GetLine(textFile, &textFile->cursor), &str[start], size, textFile->cursor.position);
             textFile->cursor.position += size;
             TextFile_InsertNewLine(textFile);
             start = i + 1;
         }
     }
     size = i - start;
-    DArray_insert_many(textFile->cursor.line, &str[start], size, textFile->cursor.position);
+    DArray_insert_many(Cursor_GetLine(textFile, &textFile->cursor), &str[start], size, textFile->cursor.position);
     textFile->cursor.position += size;
 }
 
 void TextFile_InsertNewLine(TextFile *textFile)
 {
     size_t new_line_pos = textFile->cursor.line_num + 1;
-    size_t new_line_chars = textFile->cursor.line->count - textFile->cursor.position;
+    size_t new_line_chars = Cursor_GetLine(textFile, &textFile->cursor)->count - textFile->cursor.position;
 
     // Build new line
     DArray_char *new_line2 = malloc(sizeof(DArray_char));
@@ -144,17 +145,16 @@ void TextFile_InsertNewLine(TextFile *textFile)
         return;
     }
     memset(new_line2, 0, sizeof(DArray_char));
-    DArray_append_many(new_line2, &textFile->cursor.line->items[textFile->cursor.position], new_line_chars);
+    DArray_append_many(new_line2, &Cursor_GetLine(textFile, &textFile->cursor)->items[textFile->cursor.position], new_line_chars);
 
     DArray_insert(textFile, new_line2, new_line_pos);
 
     // Add return of line
-    if (textFile->cursor.position != textFile->cursor.line->count)
-        DArray_remove_from(textFile->cursor.line, textFile->cursor.position);
+    if (textFile->cursor.position != Cursor_GetLine(textFile, &textFile->cursor)->count)
+        DArray_remove_from(Cursor_GetLine(textFile, &textFile->cursor), textFile->cursor.position);
 
     // Update cursor
     textFile->cursor.line_num++;
-    textFile->cursor.line = textFile->items[textFile->cursor.line_num];
     textFile->cursor.position = 0;
 }
 
@@ -164,12 +164,11 @@ void TextFile_RemoveLine_Left(TextFile *textFile)
         return;
 
     size_t position_pre_line = textFile->items[textFile->cursor.line_num - 1]->count;
-    DArray_append_many(textFile->items[textFile->cursor.line_num - 1], textFile->cursor.line->items, textFile->cursor.line->count);
+    DArray_append_many(textFile->items[textFile->cursor.line_num - 1], Cursor_GetLine(textFile, &textFile->cursor)->items, Cursor_GetLine(textFile, &textFile->cursor)->count);
     DArray_remove(textFile, textFile->cursor.line_num);
 
     // Update cursor
     textFile->cursor.line_num--;
-    textFile->cursor.line = textFile->items[textFile->cursor.line_num];
     textFile->cursor.position = position_pre_line;
 }
 
@@ -178,7 +177,7 @@ void TextFile_RemoveLine_Right(TextFile *textFile)
     if (textFile->cursor.line_num + 1 == textFile->count)
         return;
 
-    DArray_append_many(textFile->cursor.line, textFile->items[textFile->cursor.line_num + 1]->items, textFile->items[textFile->cursor.line_num + 1]->count);
+    DArray_append_many(Cursor_GetLine(textFile, &textFile->cursor), textFile->items[textFile->cursor.line_num + 1]->items, textFile->items[textFile->cursor.line_num + 1]->count);
     DArray_remove(textFile, textFile->cursor.line_num + 1);
 }
 
@@ -191,7 +190,7 @@ void TextFile_RemoveChar_Left(TextFile *textFile)
         return;
     }
 
-    DArray_remove(textFile->cursor.line, cursor_pos - 1);
+    DArray_remove(Cursor_GetLine(textFile, &textFile->cursor), cursor_pos - 1);
 
     // Update cursor
     textFile->cursor.position--;
@@ -200,15 +199,14 @@ void TextFile_RemoveChar_Left(TextFile *textFile)
 void TextFile_RemoveChar_Right(TextFile *textFile)
 {
     size_t cursor_pos = textFile->cursor.position;
-    if (cursor_pos == textFile->cursor.line->count)
+    if (cursor_pos == Cursor_GetLine(textFile, &textFile->cursor)->count)
     {
         TextFile_RemoveLine_Right(textFile);
         return;
     }
 
-    DArray_remove(textFile->cursor.line, cursor_pos);
+    DArray_remove(Cursor_GetLine(textFile, &textFile->cursor), cursor_pos);
 }
-
 
 void TextFile_Logic(Editor *editor)
 {
@@ -242,13 +240,14 @@ void TextFile_Logic(Editor *editor)
 
         if (IsKeyPressed(KEY_C))
         {
-            // TODO: now only copy the entire line
-            SetClipboardText(editor->currentTextFile.cursor.line->items);
+            SetClipboardText(editor->currentTextFile.cursor_select.items);
         }
 
         if (IsKeyPressed(KEY_V))
         {
             TextFile_InsertStr(&editor->currentTextFile, GetClipboardText());
+            DArray_clear(&editor->currentTextFile.cursor_select);
+            DArray_clear(&editor->currentTextFile.rect_select);
         }
     }
 }
@@ -279,9 +278,4 @@ void TextFile_Draw(Editor *editor)
     // Draw line separator numbers
     int final_num_pos = FONT_SIZE * i;
     DrawLineEx((Vector2){-4, 0}, (Vector2){-4, final_num_pos}, 1, GRAY);
-    // Draw cursor
-    // DrawRectangleV(editor->cursor_pos, (Vector2){2, FONT_SIZE}, WHITE);
-    // DEBUG("%s", editor->currentTextFile.cursor_select.items);
-    // Draw select text
-    
 }

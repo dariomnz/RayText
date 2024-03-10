@@ -56,14 +56,14 @@ void Directory_Load(Directories *directories, Directory *dir_name)
     Directory *directory_pre = malloc(sizeof(Directory));
     memset(directory_pre, 0, sizeof(Directory));
     DArray_append_many(directory_pre, "..", 3);
-    directory_pre->is_file = IsPathFile(filePathList.paths[i]);
+    directory_pre->is_file = false;
     DArray_insert(directories, directory_pre, 0);
 
     // Current dir
     Directory *directory_current = malloc(sizeof(Directory));
     memset(directory_current, 0, sizeof(Directory));
     DArray_append_many(directory_current, ".", 2);
-    directory_current->is_file = IsPathFile(filePathList.paths[i]);
+    directory_current->is_file = false;
     DArray_insert(directories, directory_current, 0);
 
     // Sorting files alphabetically
