@@ -24,7 +24,6 @@ void Editor_Init(Editor *editor)
     editor->font = LoadFontEx("." PATH_SEPARATOR "resources" PATH_SEPARATOR "fonts" PATH_SEPARATOR "Monaco.ttf", 82, 0, 0);
     SetTextureFilter(editor->font.texture, TEXTURE_FILTER_BILINEAR);
     editor->currentTextFile = TextFile_LoadEmpty();
-    memset(&editor->currentDirectory, 0, sizeof(Directory));
 
     editor->zoom = 1.0f;
     editor->camera.zoom = 1.0f;

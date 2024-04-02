@@ -64,7 +64,7 @@ void Command_Consume(Editor *editor)
         if (*endptr == '\0')
         {
             DEBUG("go to line: %ld", val);
-            if (val - 1 < editor->currentTextFile.buffer.size() && val > 0)
+            if (val - 1 < (long)editor->currentTextFile.buffer.size() && val > 0)
             {
                 editor->currentTextFile.cursor.line_num = val - 1;
                 editor->currentTextFile.cursor.position = 0;

@@ -35,8 +35,7 @@ void Directory_Update(Directories *directories, string dir_name)
 
 void Directory_Load(Directories *directories, string dir_name)
 {
-    size_t i = 0, j = 0, k = 0;
-
+    size_t i = 0;
     directories->selected = 0;
     directories->items.clear();
 
@@ -104,7 +103,7 @@ void Directory_Logic(Editor *editor)
         }
     }
 
-    editor->cursor_pos = (Vector2){0, editor->currentDirectory.selected * FONT_SIZE};
+    editor->cursor_pos = (Vector2){0, (float)editor->currentDirectory.selected * FONT_SIZE};
 }
 
 void Directory_Draw(Editor *editor)
@@ -119,7 +118,7 @@ void Directory_Draw(Editor *editor)
             color = WHITE;
         else
             color = BLUE;
-        Vector2 pos = (Vector2){0, FONT_SIZE * a};
+        Vector2 pos = (Vector2){0, (float)FONT_SIZE * a};
         DrawTextEx(editor->font, editor->currentDirectory.items[a].name.c_str(), pos, FONT_SIZE, FONT_SPACING, color);
     }
 }

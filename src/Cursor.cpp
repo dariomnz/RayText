@@ -8,7 +8,7 @@ Vector2 Cursor_GetPosition(TextFile *textFile, Font font)
     size_t cursor_pos = textFile->cursor.position;
     if (Cursor_GetLine(textFile, &textFile->cursor).size() == 0)
     {
-        return (Vector2){0, FONT_SIZE * textFile->cursor.line_num};
+        return (Vector2){0, (float)FONT_SIZE * textFile->cursor.line_num};
     }
     string aux = Cursor_GetLine(textFile, &textFile->cursor).substr(0, cursor_pos);
     Vector2 cursor_vec_pos = MeasureTextEx(font, aux.c_str(), FONT_SIZE, FONT_SPACING);
@@ -18,9 +18,8 @@ Vector2 Cursor_GetPosition(TextFile *textFile, Font font)
 
 string &Cursor_GetLine(TextFile *textFile, Cursor *cursor)
 {
-    string out;
     if (cursor->line_num == -1)
-        return out;
+        throw std::range_error("Cursor_GetLine cursor line_num out of range");
     return textFile->buffer.at(cursor->line_num);
 }
 
@@ -44,7 +43,7 @@ void Cursor_GetSelected(TextFile *textFile, Font font)
     textFile->rect_select.clear();
     Vector2 start_blank_size;
     Vector2 str_size;
-    for (size_t i = cursor1->line_num; i <= cursor2->line_num; i++)
+    for (int i = cursor1->line_num; i <= cursor2->line_num; i++)
     {
         aux.clear();
         aux2.clear();
@@ -93,7 +92,7 @@ void Cursor_GetSelected(TextFile *textFile, Font font)
             str_size = MeasureTextEx(font, aux.c_str(), FONT_SIZE, FONT_SPACING);
             Rectangle new_rect = {
                 .x = 0,
-                .y = FONT_SIZE * i,
+                .y = (float)FONT_SIZE * i,
                 .width = str_size.x,
                 .height = str_size.y,
             };
@@ -109,7 +108,7 @@ void Cursor_GetSelected(TextFile *textFile, Font font)
 
             Rectangle new_rect = {
                 .x = 0,
-                .y = FONT_SIZE * i,
+                .y = (float)FONT_SIZE * i,
                 .width = str_size.x,
                 .height = str_size.y,
             };
@@ -138,7 +137,7 @@ void Cursor_CheckClickCursorPosition(TextFile *textFile, Editor *editor)
     {
         if (i < 0)
             continue;
-        if (i >= textFile->buffer.size())
+        if (i >= (int)textFile->buffer.size())
             break;
         line_collision_box.y = FONT_SIZE * i;
         line_size = MeasureTextEx(editor->font, textFile->buffer[i].c_str(), FONT_SIZE, FONT_SPACING);
