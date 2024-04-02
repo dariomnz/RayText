@@ -3,8 +3,9 @@
 
 #include <stdio.h>
 
+#include "DArray.hpp"
 #include "raylib.h"
-#include "DArray.h"
+#include "raymath.h"
 
 // Structs
 
@@ -16,9 +17,9 @@ typedef struct Cursor
 
 typedef struct DArray_rectangle
 {
-    Rectangle *items;     // Array of elements can have any type
-    size_t count;    // Count of current elements
-    size_t capacity; // Capacity of current items in memory
+    Rectangle *items; // Array of elements can have any type
+    size_t count;     // Count of current elements
+    size_t capacity;  // Capacity of current items in memory
 } DArray_rectangle;
 
 typedef struct TextFile

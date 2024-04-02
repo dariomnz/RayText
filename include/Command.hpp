@@ -1,8 +1,8 @@
 #ifndef Command_H
 #define Command_H
 
-#include "Common.h"
-#include "Editor.h"
+#include "Common.hpp"
+#include "Editor.hpp"
 
 void Command_InsertChar(DArray_char *command, char c);
 void Command_RemoveChar(DArray_char *command);

@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "Common.hpp"
 
 int FloatEqualsEpsilon(float x, float y, float epsilon)
 {

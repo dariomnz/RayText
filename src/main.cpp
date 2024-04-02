@@ -1,6 +1,6 @@
-#include "Common.h"
-#include "Editor.h"
-#include "DArray.h"
+#include "Common.hpp"
+#include "Editor.hpp"
+#include "DArray.hpp"
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -11,10 +11,9 @@ int main(void)
     //--------------------------------------------------------------------------------------
     SetTargetFPS(60);
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    
+
     Editor editor = {0};
     Editor_Init(&editor);
-
 
     // Main game loop
     while (!WindowShouldClose() && !editor.the_end) // Detect window close button or ESC key

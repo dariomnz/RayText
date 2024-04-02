@@ -1,4 +1,4 @@
-#include "Command.h"
+#include "Command.hpp"
 #include <ctype.h>
 #include <stdlib.h>
 
@@ -120,7 +120,7 @@ void Command_Draw(Editor *editor)
         width = command_size.x + 5;
     DrawRectangleCenter(centerX, centerY, width + 5, height + 5, WHITE);
     DrawRectangleCenter(centerX, centerY, width, height, DARKGRAY);
-    DrawTextExCenter(editor->font, editor->currentCommand.items, (Vector2){centerX, centerY}, FONT_SIZE, FONT_SPACING, WHITE);
+    DrawTextExCenter(editor->font, editor->currentCommand.items, (Vector2){(float)centerX, (float)centerY}, FONT_SIZE, FONT_SPACING, WHITE);
 }
 
 void Command_Free(DArray_char *command)

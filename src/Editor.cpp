@@ -1,4 +1,4 @@
-#include "Editor.h"
+#include "Editor.hpp"
 
 int keys_to_check[8] = {KEY_RIGHT,
                         KEY_LEFT,
@@ -29,7 +29,7 @@ void Editor_Init(Editor *editor)
 
     editor->zoom = 1.0f;
     editor->camera.zoom = 1.0f;
-    editor->camera.offset = (Vector2){editor->screenWidth / 2, editor->screenHeight / 2};
+    editor->camera.offset = (Vector2){(float)editor->screenWidth / 2, (float)editor->screenHeight / 2};
 
     editor->editor_state = STATE_TEXTFILE;
     editor->cursor_pos = Vector2Zero();
@@ -44,14 +44,14 @@ void Editor_Logic(Editor *editor)
         editor->screenWidth = GetScreenWidth();
         editor->screenHeight = GetScreenHeight();
 
-        editor->camera.offset = (Vector2){editor->screenWidth / 2, editor->screenHeight / 2};
+        editor->camera.offset = (Vector2){(float)editor->screenWidth / 2, (float)editor->screenHeight / 2};
     }
 
-    editor->key_pressed = 0;
+    editor->key_pressed = KEY_NULL;
     FOR_EACH(int, key, keys_to_check)
     {
         if (IsKeyPressed(*key) || IsKeyPressedRepeat(*key))
-            editor->key_pressed = *key;
+            editor->key_pressed = (KeyboardKey)*key;
     }
     editor->char_pressed = GetCharPressed();
 

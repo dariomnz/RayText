@@ -1,5 +1,5 @@
-#include "TextFile.h"
-#include "DArray.h"
+#include "TextFile.hpp"
+#include "DArray.hpp"
 
 TextFile TextFile_Load(const DArray_char *file_name)
 {
@@ -174,11 +174,11 @@ void TextFile_RemoveLine_Left(TextFile *textFile)
 
 void TextFile_RemoveLine_Right(TextFile *textFile)
 {
-    if (textFile->cursor.line_num + 1 == textFile->count)
+    if (textFile->cursor.line_num + 1 == (int)textFile->count)
         return;
 
     DArray_append_many(Cursor_GetLine(textFile, &textFile->cursor), textFile->items[textFile->cursor.line_num + 1]->items, textFile->items[textFile->cursor.line_num + 1]->count);
-    DArray_remove(textFile, textFile->cursor.line_num + 1);
+    DArray_remove(textFile, (size_t)textFile->cursor.line_num + 1);
 }
 
 void TextFile_RemoveChar_Left(TextFile *textFile)
@@ -266,16 +266,16 @@ void TextFile_Draw(Editor *editor)
     {
         if (i < 0)
             continue;
-        if (i >= editor->currentTextFile.count)
+        if (i >= (int)editor->currentTextFile.count)
             break;
         // Draw text
-        DrawTextEx(editor->font, editor->currentTextFile.items[i]->items, (Vector2){0, FONT_SIZE * i}, FONT_SIZE, FONT_SPACING, WHITE);
+        DrawTextEx(editor->font, editor->currentTextFile.items[i]->items, (Vector2){0, (float)FONT_SIZE * i}, FONT_SIZE, FONT_SPACING, WHITE);
         // Draw line number
         sprintf(str_line_number, "%d ", i + 1);
         str_line_number_size = MeasureTextEx(editor->font, str_line_number, FONT_SIZE, FONT_SPACING);
-        DrawTextEx(editor->font, str_line_number, (Vector2){-str_line_number_size.x, FONT_SIZE * i}, FONT_SIZE, FONT_SPACING, GRAY);
+        DrawTextEx(editor->font, str_line_number, (Vector2){-str_line_number_size.x, (float)FONT_SIZE * i}, FONT_SIZE, FONT_SPACING, GRAY);
     }
     // Draw line separator numbers
     int final_num_pos = FONT_SIZE * i;
-    DrawLineEx((Vector2){-4, 0}, (Vector2){-4, final_num_pos}, 1, GRAY);
+    DrawLineEx((Vector2){-4, 0}, (Vector2){-4, (float)final_num_pos}, 1, GRAY);
 }

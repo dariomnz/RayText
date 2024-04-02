@@ -5,7 +5,6 @@
 #include <string.h>
 
 #include "raylib.h"
-#include "rlgl.h"
 #include "raymath.h"
 
 #ifdef _WIN32

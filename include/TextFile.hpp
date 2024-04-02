@@ -1,10 +1,10 @@
 #ifndef TextFile_H
 #define TextFile_H
 
-#include "Common.h"
-#include "Structs.h"
-#include "DArray.h"
-#include "Editor.h"
+#include "Common.hpp"
+#include "Structs.hpp"
+#include "Editor.hpp"
+#include "raymath.h"
 
 TextFile TextFile_Load(const DArray_char *file_name);
 TextFile TextFile_LoadEmpty(void);
@@ -17,7 +17,6 @@ void TextFile_InsertChar(TextFile *textFile, char c);
 void TextFile_RemoveChar(TextFile *textFile);
 void TextFile_InsertNewLine(TextFile *textFile);
 void TextFile_RemovePreLine(TextFile *textFile);
-
 
 DArray_char *TextFile_GetLine(TextFile *textFile, Cursor *cursor);
 void TextFile_MoveCursor(TextFile *textFile, KeyboardKey key_pressed);

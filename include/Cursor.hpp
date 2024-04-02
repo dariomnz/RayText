@@ -1,9 +1,10 @@
 #ifndef Cursor_H
 #define Cursor_H
 
-#include "DArray.h"
-#include "Structs.h"
-#include "Editor.h"
+#include "Structs.hpp"
+#include "Editor.hpp"
+#include "DArray.hpp"
+#include "raymath.h"
 
 DArray_char *Cursor_GetLine(TextFile *textFile, Cursor *cursor);
 

@@ -1,4 +1,5 @@
-#include "Cursor.h"
+#include "Cursor.hpp"
+#include "DArray.hpp"
 
 Vector2 Cursor_GetPosition(TextFile *textFile, Font font)
 {
@@ -194,6 +195,8 @@ void Cursor_Move(TextFile *textFile, Font font, KeyboardKey key_pressed)
     case KEY_UP:
     case KEY_DOWN:
         Cursor_UpdateSelect(textFile, font);
+    default:
+        break;
     }
     switch (key_pressed)
     {
@@ -202,7 +205,7 @@ void Cursor_Move(TextFile *textFile, Font font, KeyboardKey key_pressed)
         if (textFile->cursor.position > Cursor_GetLine(textFile, &textFile->cursor)->count)
         {
             key_pressed = KEY_DOWN;
-            if (textFile->cursor.line_num != textFile->count - 1)
+            if (textFile->cursor.line_num != (int)textFile->count - 1)
                 textFile->cursor.position = 0;
         }
         // DEBUG("KEY_RIGHT");
@@ -231,7 +234,7 @@ void Cursor_Move(TextFile *textFile, Font font, KeyboardKey key_pressed)
         // DEBUG("KEY_UP");
         break;
     case KEY_DOWN:
-        if (textFile->cursor.line_num < textFile->count - 1)
+        if (textFile->cursor.line_num < (int)textFile->count - 1)
         {
             textFile->cursor.line_num++;
         }
@@ -251,6 +254,8 @@ void Cursor_Move(TextFile *textFile, Font font, KeyboardKey key_pressed)
     case KEY_UP:
     case KEY_DOWN:
         Cursor_UpdateSelect(textFile, font);
+    default:
+        break;
     }
 }
 
@@ -260,7 +265,7 @@ void Cursor_Logic(Editor *editor)
     {
         if (editor->key_pressed == KEY_DOWN)
         {
-            if (editor->currentDirectory.selected + 1 < editor->currentDirectory.count)
+            if (editor->currentDirectory.selected + 1 < (int)editor->currentDirectory.count)
             {
                 editor->currentDirectory.selected++;
             }
@@ -287,7 +292,7 @@ void Cursor_Draw(Editor *editor)
     if (editor->editor_state == STATE_DIRECTORY)
     {
         int selected = editor->currentDirectory.selected;
-        Vector2 pos = (Vector2){0, FONT_SIZE * selected};
+        Vector2 pos = (Vector2){0, (float)FONT_SIZE * selected};
         Vector2 back_size = MeasureTextEx(editor->font, editor->currentDirectory.items[selected]->items, FONT_SIZE, FONT_SPACING);
         DrawRectangleV(pos, back_size, DARKGRAY);
     }

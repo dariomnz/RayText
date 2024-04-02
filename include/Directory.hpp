@@ -1,10 +1,10 @@
 #ifndef Directory_H
 #define Directory_H
 
-#include "Common.h"
-#include "DArray.h"
-#include "Structs.h"
-#include "Editor.h"
+#include "Common.hpp"
+#include "Structs.hpp"
+#include "Editor.hpp"
+#include "raymath.h"
 
 void Directory_Load(Directories *directories, Directory *dir_name);
 

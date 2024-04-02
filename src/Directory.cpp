@@ -1,5 +1,5 @@
-#include "Directory.h"
-#include "DArray.h"
+#include "Directory.hpp"
+#include "DArray.hpp"
 
 void Directory_Update(Directories *directories, Directory *dir_name)
 {
@@ -129,7 +129,7 @@ void Directory_Draw(Editor *editor)
     if (editor->editor_state != STATE_DIRECTORY)
         return;
     Color color = RED;
-    for (int a = 0; a < editor->currentDirectory.count; a++)
+    for (int a = 0; a < (int)editor->currentDirectory.count; a++)
     {
         if (editor->currentDirectory.items[a]->is_file)
             color = WHITE;
