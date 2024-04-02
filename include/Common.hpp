@@ -6,6 +6,7 @@
 
 #include "raylib.h"
 #include "raymath.h"
+#include <iostream>
 
 #ifdef _WIN32
 #define PATH_SEPARATOR "\\"
@@ -15,6 +16,9 @@
 
 #define FONT_SIZE 20
 #define FONT_SPACING 0
+
+#define DEBUG_MSG(fmt) std::cout << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__ << "(): " << fmt << std::endl;
+#define DEBUG_ERROR(fmt) std::cerr << "[" << __FILE__ << ":" << __LINE__ << "] " << __func__ << "() ERROR: " << fmt << std::endl;
 
 #define DEBUG(fmt, ...) fprintf(stderr, "[%s:%d] %s(): " fmt "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__)
 

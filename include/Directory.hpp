@@ -5,8 +5,9 @@
 #include "Structs.hpp"
 #include "Editor.hpp"
 #include "raymath.h"
+#include "string"
 
-void Directory_Load(Directories *directories, Directory *dir_name);
+void Directory_Load(Directories *directories, std::string *dir_name);
 
 void Directory_Logic(Editor *editor);
 void Directory_Draw(Editor *editor);

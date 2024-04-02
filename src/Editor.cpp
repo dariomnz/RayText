@@ -23,7 +23,6 @@ void Editor_Init(Editor *editor)
 
     editor->font = LoadFontEx("." PATH_SEPARATOR "resources" PATH_SEPARATOR "fonts" PATH_SEPARATOR "Monaco.ttf", 82, 0, 0);
     SetTextureFilter(editor->font.texture, TEXTURE_FILTER_BILINEAR);
-    memset(&editor->currentCommand, 0, sizeof(DArray_char));
     editor->currentTextFile = TextFile_LoadEmpty();
     memset(&editor->currentDirectory, 0, sizeof(Directory));
 
@@ -99,7 +98,7 @@ void Editor_Close(Editor *editor)
 {
     TextFile_Free(&editor->currentTextFile);
     Directory_Free(&editor->currentDirectory);
-    Command_Free(&editor->currentCommand);
+    // Command_Free(&editor->currentCommand);
     UnloadFont(editor->font);
 
     CloseWindow(); // Close window and OpenGL context

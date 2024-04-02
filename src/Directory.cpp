@@ -1,7 +1,10 @@
 #include "Directory.hpp"
 #include "DArray.hpp"
+#include "string"
 
-void Directory_Update(Directories *directories, Directory *dir_name)
+using namespace std;
+
+void Directory_Update(Directories *directories, string *dir_name)
 {
     if (directories->name.count == 0)
     {
@@ -11,24 +14,24 @@ void Directory_Update(Directories *directories, Directory *dir_name)
     }
 
     const char *aux;
-    if (strcmp(dir_name->items, "..") == 0)
+    if (dir_name->compare("..") == 0)
     {
         aux = GetDirectoryPath(directories->name.items);
         DArray_clear(&directories->name);
         DArray_append_many(&directories->name, aux, strlen(aux));
     }
-    else if (strcmp(dir_name->items, ".") == 0)
+    else if (dir_name->compare(".") == 0)
     {
         return;
     }
     else
     {
         DArray_append_many(&directories->name, PATH_SEPARATOR, 1);
-        DArray_append_many(&directories->name, dir_name->items, dir_name->count);
+        DArray_append_many(&directories->name, dir_name->c_str(), dir_name->size());
     }
 }
 
-void Directory_Load(Directories *directories, Directory *dir_name)
+void Directory_Load(Directories *directories, string *dir_name)
 {
     size_t i = 0, j = 0, k = 0;
 
@@ -91,10 +94,7 @@ void Directory_Logic(Editor *editor)
         else
         {
             editor->editor_state = STATE_DIRECTORY;
-            Directory aux = {0};
-            DArray_append(&aux, '.');
-            Directory_Load(&editor->currentDirectory, &aux);
-            DArray_free(&aux);
+            Directory_Load(&editor->currentDirectory, &(string)".");
         }
     }
 
@@ -115,7 +115,7 @@ void Directory_Logic(Editor *editor)
         }
         else
         {
-            Directory_Load(&editor->currentDirectory, editor->currentDirectory.items[editor->currentDirectory.selected]);
+            Directory_Load(&editor->currentDirectory, &(string)editor->currentDirectory.items[editor->currentDirectory.selected]->items);
         }
         DArray_free(&aux);
     }

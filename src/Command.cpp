@@ -1,16 +1,9 @@
 #include "Command.hpp"
 #include <ctype.h>
 #include <stdlib.h>
+#include <string>
 
-void Command_InsertChar(DArray_char *command, char c)
-{
-    DArray_append(command, c);
-}
-
-void Command_RemoveChar(DArray_char *command)
-{
-    DArray_remove(command, command->count - 1);
-}
+using namespace std;
 
 /// @brief strstart( "123456789", "123" ) = true
 /// @param str1 str to check
@@ -29,47 +22,45 @@ bool strstart(char *str1, char *str2)
     return true;
 }
 
-void trimwhitespace(DArray_char *str)
+void trimwhitespace(string *str)
 {
     // Trim leading space
-    while (str->items[0] == ' ')
-        DArray_remove(str, 0);
+    while (str->front() == ' ')
+        str->erase(0);
     // Trim trailing space
-    while (str->items[str->count - 1] == ' ')
-        DArray_remove(str, str->count - 1);
+    while (str->back() == ' ')
+        str->pop_back();
 }
 
 void Command_Consume(Editor *editor)
 {
-    if (editor->currentCommand.count == 0)
+    if (editor->currentCommand.size() == 0)
         return;
-    if (editor->currentCommand.items[0] == '>')
+    if (editor->currentCommand[0] == '>')
     {
-        if (strcmp(editor->currentCommand.items, ">save") == 0)
+        if (editor->currentCommand.compare(">save") == 0)
         {
             DEBUG(">save");
             TextFile_Save(&editor->currentTextFile);
         }
-        else if (strcmp(editor->currentCommand.items, ">exit") == 0)
+        else if (editor->currentCommand.compare(">exit") == 0)
         {
             DEBUG(">exit");
             editor->the_end = true;
         }
-        else if (strstart(editor->currentCommand.items, ">dir"))
+        else if (editor->currentCommand.compare(">dir"))
         {
-            Directory aux = {0};
-            DArray_append_many(&aux, &editor->currentCommand.items[4], editor->currentCommand.count - 4);
-            trimwhitespace((DArray_char *)&aux);
-            DEBUG(">dir Name of dir: %s", aux.items);
+            string aux = editor->currentCommand.substr(4);
+            trimwhitespace(&aux);
+            DEBUG_MSG(">dir Name of dir: %s" << aux);
             Directory_Load(&editor->currentDirectory, &aux);
             editor->editor_state = STATE_DIRECTORY;
-            DArray_free(&aux);
         }
     }
-    else if (editor->currentCommand.items[0] == ':')
+    else if (editor->currentCommand[0] == ':')
     {
         char *endptr;
-        long val = strtol(&editor->currentCommand.items[1], &endptr, 10);
+        long val = strtol(&editor->currentCommand[1], &endptr, 10);
         if (*endptr == '\0')
         {
             DEBUG("go to line: %ld", val);
@@ -80,8 +71,7 @@ void Command_Consume(Editor *editor)
             }
         }
     }
-
-    DArray_clear(&editor->currentCommand);
+    editor->currentCommand.clear();
     if (editor->editor_state == STATE_COMMAND)
         editor->editor_state = STATE_TEXTFILE;
 }
@@ -95,10 +85,10 @@ void Command_Logic(Editor *editor)
         return;
 
     if (editor->key_pressed == KEY_BACKSPACE)
-        Command_RemoveChar(&editor->currentCommand);
+        editor->currentCommand.pop_back();
 
     if (editor->char_pressed != 0)
-        Command_InsertChar(&editor->currentCommand, editor->char_pressed);
+        editor->currentCommand += editor->char_pressed;
 
     if (editor->key_pressed == KEY_ENTER)
     {
@@ -112,7 +102,7 @@ void Command_Draw(Editor *editor)
         return;
     int centerX = GetScreenWidth() / 2;
     int centerY = FONT_SIZE;
-    Vector2 command_size = MeasureTextEx(editor->font, editor->currentCommand.items, FONT_SIZE, FONT_SPACING);
+    Vector2 command_size = MeasureTextEx(editor->font, editor->currentCommand.c_str(), FONT_SIZE, FONT_SPACING);
     command_size.y = FONT_SIZE;
     int width = GetScreenWidth() * 0.66f;
     int height = command_size.y + 5;
@@ -120,10 +110,10 @@ void Command_Draw(Editor *editor)
         width = command_size.x + 5;
     DrawRectangleCenter(centerX, centerY, width + 5, height + 5, WHITE);
     DrawRectangleCenter(centerX, centerY, width, height, DARKGRAY);
-    DrawTextExCenter(editor->font, editor->currentCommand.items, (Vector2){(float)centerX, (float)centerY}, FONT_SIZE, FONT_SPACING, WHITE);
+    DrawTextExCenter(editor->font, editor->currentCommand.c_str(), (Vector2){(float)centerX, (float)centerY}, FONT_SIZE, FONT_SPACING, WHITE);
 }
 
-void Command_Free(DArray_char *command)
-{
-    DArray_free(command);
-}
+// void Command_Free(DArray_char *command)
+// {
+//     DArray_free(command);
+// }

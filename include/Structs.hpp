@@ -6,6 +6,7 @@
 #include "DArray.hpp"
 #include "raylib.h"
 #include "raymath.h"
+#include "string"
 
 // Structs
 
@@ -65,7 +66,7 @@ typedef struct Editor
     int screenWidth;
     int screenHeight;
     TextFile currentTextFile;
-    DArray_char currentCommand;
+    std::string currentCommand;
     Directories currentDirectory;
     Font font;
     Camera2D camera;

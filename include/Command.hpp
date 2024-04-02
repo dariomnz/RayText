@@ -4,12 +4,9 @@
 #include "Common.hpp"
 #include "Editor.hpp"
 
-void Command_InsertChar(DArray_char *command, char c);
-void Command_RemoveChar(DArray_char *command);
 void Command_Consume(Editor *editor);
 
 void Command_Logic(Editor *editor);
 void Command_Draw(Editor *editor);
-void Command_Free(DArray_char *command);
 
 #endif // Command_H
