@@ -53,7 +53,7 @@ void Command_Consume(Editor *editor)
             string aux = editor->currentCommand.substr(4);
             trimwhitespace(&aux);
             DEBUG_MSG(">dir Name of dir: %s" << aux);
-            Directory_Load(&editor->currentDirectory, &aux);
+            Directory_Load(&editor->currentDirectory, aux);
             editor->editor_state = STATE_DIRECTORY;
         }
     }
@@ -64,7 +64,7 @@ void Command_Consume(Editor *editor)
         if (*endptr == '\0')
         {
             DEBUG("go to line: %ld", val);
-            if (val - 1 < editor->currentTextFile.count && val > 0)
+            if (val - 1 < editor->currentTextFile.buffer.size() && val > 0)
             {
                 editor->currentTextFile.cursor.line_num = val - 1;
                 editor->currentTextFile.cursor.position = 0;
@@ -112,8 +112,3 @@ void Command_Draw(Editor *editor)
     DrawRectangleCenter(centerX, centerY, width, height, DARKGRAY);
     DrawTextExCenter(editor->font, editor->currentCommand.c_str(), (Vector2){(float)centerX, (float)centerY}, FONT_SIZE, FONT_SPACING, WHITE);
 }
-
-// void Command_Free(DArray_char *command)
-// {
-//     DArray_free(command);
-// }

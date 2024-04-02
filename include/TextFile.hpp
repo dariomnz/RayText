@@ -5,8 +5,9 @@
 #include "Structs.hpp"
 #include "Editor.hpp"
 #include "raymath.h"
+#include <string>
 
-TextFile TextFile_Load(const DArray_char *file_name);
+TextFile TextFile_Load(std::string file_name);
 TextFile TextFile_LoadEmpty(void);
 void TextFile_Free(TextFile *textFile);
 void TextFile_Save(TextFile *textFile);
@@ -18,7 +19,6 @@ void TextFile_RemoveChar(TextFile *textFile);
 void TextFile_InsertNewLine(TextFile *textFile);
 void TextFile_RemovePreLine(TextFile *textFile);
 
-DArray_char *TextFile_GetLine(TextFile *textFile, Cursor *cursor);
 void TextFile_MoveCursor(TextFile *textFile, KeyboardKey key_pressed);
 Vector2 TextFile_GetCursorPosition(TextFile *textFile, Font font);
 

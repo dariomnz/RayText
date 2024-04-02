@@ -1,24 +1,27 @@
 #include "Cursor.hpp"
-#include "DArray.hpp"
+#include <string>
+
+using namespace std;
 
 Vector2 Cursor_GetPosition(TextFile *textFile, Font font)
 {
     size_t cursor_pos = textFile->cursor.position;
-    if (Cursor_GetLine(textFile, &textFile->cursor)->count == 0)
+    if (Cursor_GetLine(textFile, &textFile->cursor).size() == 0)
     {
         return (Vector2){0, FONT_SIZE * textFile->cursor.line_num};
     }
-    char cursor_char = Cursor_GetLine(textFile, &textFile->cursor)->items[cursor_pos];
-    Cursor_GetLine(textFile, &textFile->cursor)->items[cursor_pos] = '\0';
-    Vector2 cursor_vec_pos = MeasureTextEx(font, Cursor_GetLine(textFile, &textFile->cursor)->items, FONT_SIZE, FONT_SPACING);
-    Cursor_GetLine(textFile, &textFile->cursor)->items[cursor_pos] = cursor_char;
+    string aux = Cursor_GetLine(textFile, &textFile->cursor).substr(0, cursor_pos);
+    Vector2 cursor_vec_pos = MeasureTextEx(font, aux.c_str(), FONT_SIZE, FONT_SPACING);
     cursor_vec_pos.y = FONT_SIZE * textFile->cursor.line_num;
     return cursor_vec_pos;
 }
 
-DArray_char *Cursor_GetLine(TextFile *textFile, Cursor *cursor)
+string &Cursor_GetLine(TextFile *textFile, Cursor *cursor)
 {
-    return cursor->line_num != -1 ? textFile->items[cursor->line_num] : NULL;
+    string out;
+    if (cursor->line_num == -1)
+        return out;
+    return textFile->buffer.at(cursor->line_num);
 }
 
 void Cursor_GetSelected(TextFile *textFile, Font font)
@@ -36,74 +39,73 @@ void Cursor_GetSelected(TextFile *textFile, Font font)
         cursor2 = &textFile->cursor;
     }
 
-    DArray_char aux = {0};
-    DArray_char aux2 = {0};
-    DArray_clear(&textFile->cursor_select);
-    DArray_clear(&textFile->rect_select);
+    string aux, aux2;
+    textFile->cursor_select.clear();
+    textFile->rect_select.clear();
     Vector2 start_blank_size;
     Vector2 str_size;
     for (size_t i = cursor1->line_num; i <= cursor2->line_num; i++)
     {
-        DArray_clear(&aux);
-        DArray_clear(&aux2);
+        aux.clear();
+        aux2.clear();
         // First line
         if (i == cursor1->line_num)
         {
             if (cursor1->line_num == cursor2->line_num)
             {
-                DArray_append_many(&aux, textFile->items[i]->items, cursor1->position);
-                DArray_append_many(&aux2, &textFile->items[i]->items[cursor1->position], cursor2->position - cursor1->position);
+                aux.append(textFile->buffer[i], cursor1->position);
+                aux2.append(textFile->buffer[i].substr(cursor1->position), cursor2->position - cursor1->position);
 
-                start_blank_size = MeasureTextEx(font, aux.items, FONT_SIZE, FONT_SPACING);
-                str_size = MeasureTextEx(font, aux2.items, FONT_SIZE, FONT_SPACING);
+                start_blank_size = MeasureTextEx(font, aux.c_str(), FONT_SIZE, FONT_SPACING);
+                str_size = MeasureTextEx(font, aux2.c_str(), FONT_SIZE, FONT_SPACING);
                 Rectangle new_rect = {
                     .x = start_blank_size.x,
                     .y = start_blank_size.y * cursor1->line_num,
                     .width = str_size.x,
                     .height = str_size.y,
                 };
-                DArray_append(&textFile->rect_select, new_rect);
+                textFile->rect_select.push_back(new_rect);
 
                 // Append to total_str
-                DArray_append_many(&textFile->cursor_select, aux2.items, aux2.count);
+                textFile->cursor_select += aux2;
             }
             else
             {
-                DArray_append_many(&aux, textFile->items[i]->items, cursor1->position);
+                aux.append(textFile->buffer[i], cursor1->position);
 
-                start_blank_size = MeasureTextEx(font, aux.items, FONT_SIZE, FONT_SPACING);
-                str_size = MeasureTextEx(font, &textFile->items[i]->items[cursor1->position], FONT_SIZE, FONT_SPACING);
+                start_blank_size = MeasureTextEx(font, aux.c_str(), FONT_SIZE, FONT_SPACING);
+                str_size = MeasureTextEx(font, textFile->buffer[i].substr(cursor1->position).c_str(), FONT_SIZE, FONT_SPACING);
                 Rectangle new_rect = {
                     .x = start_blank_size.x,
                     .y = start_blank_size.y * i,
                     .width = str_size.x,
                     .height = str_size.y,
                 };
-                DArray_append(&textFile->rect_select, new_rect);
+                textFile->rect_select.push_back(new_rect);
                 // Append to total_str
-                DArray_append_many(&textFile->cursor_select, &textFile->items[i]->items[cursor1->position], textFile->items[i]->count - cursor1->position);
+                textFile->cursor_select += textFile->buffer[i].substr(cursor1->position);
             }
         }
         // Last line
         else if (i == cursor2->line_num)
         {
-            DArray_append_many(&aux, textFile->items[i]->items, cursor2->position);
-            str_size = MeasureTextEx(font, aux.items, FONT_SIZE, FONT_SPACING);
+            aux.append(textFile->buffer[i], cursor2->position);
+            str_size = MeasureTextEx(font, aux.c_str(), FONT_SIZE, FONT_SPACING);
             Rectangle new_rect = {
                 .x = 0,
                 .y = FONT_SIZE * i,
                 .width = str_size.x,
                 .height = str_size.y,
             };
-            DArray_append(&textFile->rect_select, new_rect);
+            textFile->rect_select.push_back(new_rect);
             // Append to total_str
-            DArray_append(&textFile->cursor_select, '\n');
-            DArray_append_many(&textFile->cursor_select, aux.items, aux.count);
+            textFile->cursor_select += '\n';
+            textFile->cursor_select += aux;
         }
         // Middle lines
         else
         {
-            str_size = MeasureTextEx(font, textFile->items[i]->items, FONT_SIZE, FONT_SPACING);
+            str_size = MeasureTextEx(font, textFile->buffer[i].c_str(), FONT_SIZE, FONT_SPACING);
 
             Rectangle new_rect = {
                 .x = 0,
@@ -111,14 +113,12 @@ void Cursor_GetSelected(TextFile *textFile, Font font)
                 .width = str_size.x,
                 .height = str_size.y,
             };
-            DArray_append(&textFile->rect_select, new_rect);
+            textFile->rect_select.push_back(new_rect);
             // Append to total_str
-            DArray_append(&textFile->cursor_select, '\n');
-            DArray_append_many(&textFile->cursor_select, textFile->items[i]->items, textFile->items[i]->count);
+            textFile->cursor_select += '\n';
+            textFile->cursor_select += textFile->buffer[i];
         }
     }
-    DArray_free(&aux);
-    DArray_free(&aux2);
 }
 
 void Cursor_CheckClickCursorPosition(TextFile *textFile, Editor *editor)
@@ -138,20 +138,20 @@ void Cursor_CheckClickCursorPosition(TextFile *textFile, Editor *editor)
     {
         if (i < 0)
             continue;
-        if (i >= textFile->count)
+        if (i >= textFile->buffer.size())
             break;
         line_collision_box.y = FONT_SIZE * i;
-        line_size = MeasureTextEx(editor->font, textFile->items[i]->items, FONT_SIZE, FONT_SPACING);
+        line_size = MeasureTextEx(editor->font, textFile->buffer[i].c_str(), FONT_SIZE, FONT_SPACING);
         line_collision_box.width = line_size.x + editor->screenWidth;
         line_collision_box.height = FONT_SIZE;
         if (CheckCollisionPointRec(cursor_world_position, line_collision_box))
         {
-            DArray_char aux = {0};
+            string aux;
             size_t new_pos = __SIZE_MAX__ - 1;
-            for (size_t j = 0; j < textFile->items[i]->count; j++)
+            for (size_t j = 0; j < textFile->buffer[i].size(); j++)
             {
-                DArray_append(&aux, textFile->items[i]->items[j]);
-                line_size = MeasureTextEx(editor->font, aux.items, FONT_SIZE, FONT_SPACING);
+                aux.push_back(textFile->buffer[i][j]);
+                line_size = MeasureTextEx(editor->font, aux.c_str(), FONT_SIZE, FONT_SPACING);
                 if (cursor_world_position.x < line_size.x)
                 {
                     new_pos = j;
@@ -161,7 +161,6 @@ void Cursor_CheckClickCursorPosition(TextFile *textFile, Editor *editor)
 
             textFile->cursor.line_num = i;
             textFile->cursor.position = new_pos;
-            DArray_free(&aux);
             break;
         }
     }
@@ -181,8 +180,8 @@ void Cursor_UpdateSelect(TextFile *textFile, Font font)
     else
     {
         textFile->cursor_start_select.line_num = -1;
-        DArray_clear(&textFile->cursor_select);
-        DArray_clear(&textFile->rect_select);
+        textFile->cursor_select.clear();
+        textFile->rect_select.clear();
     }
 }
 
@@ -202,10 +201,10 @@ void Cursor_Move(TextFile *textFile, Font font, KeyboardKey key_pressed)
     {
     case KEY_RIGHT:
         textFile->cursor.position++;
-        if (textFile->cursor.position > Cursor_GetLine(textFile, &textFile->cursor)->count)
+        if (textFile->cursor.position > Cursor_GetLine(textFile, &textFile->cursor).size())
         {
             key_pressed = KEY_DOWN;
-            if (textFile->cursor.line_num != (int)textFile->count - 1)
+            if (textFile->cursor.line_num != (int)textFile->buffer.size() - 1)
                 textFile->cursor.position = 0;
         }
         // DEBUG("KEY_RIGHT");
@@ -234,7 +233,7 @@ void Cursor_Move(TextFile *textFile, Font font, KeyboardKey key_pressed)
         // DEBUG("KEY_UP");
         break;
     case KEY_DOWN:
-        if (textFile->cursor.line_num < (int)textFile->count - 1)
+        if (textFile->cursor.line_num < (int)textFile->buffer.size() - 1)
         {
             textFile->cursor.line_num++;
         }
@@ -244,8 +243,8 @@ void Cursor_Move(TextFile *textFile, Font font, KeyboardKey key_pressed)
         break;
     }
     // Chech cursor position
-    if (textFile->cursor.position > Cursor_GetLine(textFile, &textFile->cursor)->count)
-        textFile->cursor.position = Cursor_GetLine(textFile, &textFile->cursor)->count;
+    if (textFile->cursor.position > Cursor_GetLine(textFile, &textFile->cursor).size())
+        textFile->cursor.position = Cursor_GetLine(textFile, &textFile->cursor).size();
 
     switch (key_pressed)
     {
@@ -265,7 +264,7 @@ void Cursor_Logic(Editor *editor)
     {
         if (editor->key_pressed == KEY_DOWN)
         {
-            if (editor->currentDirectory.selected + 1 < (int)editor->currentDirectory.count)
+            if (editor->currentDirectory.selected + 1 < (int)editor->currentDirectory.items.size())
             {
                 editor->currentDirectory.selected++;
             }
@@ -293,7 +292,7 @@ void Cursor_Draw(Editor *editor)
     {
         int selected = editor->currentDirectory.selected;
         Vector2 pos = (Vector2){0, (float)FONT_SIZE * selected};
-        Vector2 back_size = MeasureTextEx(editor->font, editor->currentDirectory.items[selected]->items, FONT_SIZE, FONT_SPACING);
+        Vector2 back_size = MeasureTextEx(editor->font, editor->currentDirectory.items[selected].name.c_str(), FONT_SIZE, FONT_SPACING);
         DrawRectangleV(pos, back_size, DARKGRAY);
     }
     else if (editor->editor_state == STATE_TEXTFILE)
@@ -301,9 +300,9 @@ void Cursor_Draw(Editor *editor)
         // Draw Cursor
         DrawRectangleV(editor->cursor_pos, (Vector2){2, FONT_SIZE}, WHITE);
         // Draw selected
-        for (size_t i = 0; i < editor->currentTextFile.rect_select.count; i++)
+        for (size_t i = 0; i < editor->currentTextFile.rect_select.size(); i++)
         {
-            DrawRectangleRec(editor->currentTextFile.rect_select.items[i], (Color){100, 100, 100, 100});
+            DrawRectangleRec(editor->currentTextFile.rect_select[i], (Color){100, 100, 100, 100});
         }
     }
 }

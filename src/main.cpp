@@ -1,6 +1,5 @@
 #include "Common.hpp"
 #include "Editor.hpp"
-#include "DArray.hpp"
 
 //------------------------------------------------------------------------------------
 // Program main entry point

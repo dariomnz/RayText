@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 
-#include "DArray.hpp"
 #include "raylib.h"
 #include "raymath.h"
-#include "string"
+#include <string>
+#include <vector>
 
 // Structs
 
@@ -16,41 +16,28 @@ typedef struct Cursor
     size_t position; // Position in line
 } Cursor;
 
-typedef struct DArray_rectangle
-{
-    Rectangle *items; // Array of elements can have any type
-    size_t count;     // Count of current elements
-    size_t capacity;  // Capacity of current items in memory
-} DArray_rectangle;
-
 typedef struct TextFile
 {
-    DArray_char **items; // Darray of pointers to lines
-    size_t count;        // Darray count
-    size_t capacity;     // Darray capacity
+    std::vector<std::string> buffer; // vector of strings for store the data;
 
-    Cursor cursor_start_select;   // Cursor start select
-    DArray_char cursor_select;    // Cursor select text
-    DArray_rectangle rect_select; // Darray of rects
-    Cursor cursor;                // Cursor
-    DArray_char name;             // Name of file
+    Cursor cursor_start_select;         // Cursor start select
+    std::string cursor_select;          // Cursor select text
+    std::vector<Rectangle> rect_select; // Vector of rects
+    Cursor cursor;                      // Cursor
+    std::string name;                   // Name of file
 } TextFile;
 
 typedef struct Directory
 {
-    char *items;     // DArray items for store names
-    size_t count;    // DArray count
-    size_t capacity; // DArray capacity
-    bool is_file;    // Selected dirent
+    std::string name; // Name
+    bool is_file;     // Selected dirent
 } Directory;
 
 typedef struct Directories
 {
-    Directory **items; // DArray items for store Directory
-    size_t count;      // DArray count
-    size_t capacity;   // DArray capacity
-    DArray_char name;  // Name of dir
-    int selected;      // Selected Directory
+    std::vector<Directory> items; // Vector of items for store Directory
+    std::string name;             // Name of dir
+    int selected;                 // Selected Directory
 } Directories;
 
 typedef enum

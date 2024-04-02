@@ -3,10 +3,10 @@
 
 #include "Structs.hpp"
 #include "Editor.hpp"
-#include "DArray.hpp"
 #include "raymath.h"
+#include <string>
 
-DArray_char *Cursor_GetLine(TextFile *textFile, Cursor *cursor);
+std::string &Cursor_GetLine(TextFile *textFile, Cursor *cursor);
 
 void Cursor_Logic(Editor *editor);
 void Cursor_Draw(Editor *editor);
