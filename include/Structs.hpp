@@ -47,24 +47,4 @@ typedef enum
     STATE_DIRECTORY = 2
 } Editor_state;
 
-typedef struct Editor
-{
-    bool initialized;
-    int screenWidth;
-    int screenHeight;
-    TextFile currentTextFile;
-    std::string currentCommand;
-    Directories currentDirectory;
-    Font font;
-    Camera2D camera;
-    float zoom;
-    Vector2 cursor_pos;
-
-    KeyboardKey key_pressed;
-    char char_pressed;
-
-    Editor_state editor_state;
-    bool the_end;
-} Editor;
-
 #endif // Structs_H

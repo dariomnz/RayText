@@ -2,11 +2,22 @@
 #define Command_H
 
 #include "Common.hpp"
-#include "Editor.hpp"
+#include <string>
 
-void Command_Consume(Editor *editor);
+class App;
 
-void Command_Logic(Editor *editor);
-void Command_Draw(Editor *editor);
+class Command
+{
+private:
+    std::string command;
+
+public:
+    Command();
+    ~Command();
+
+    void Consume(App *app);
+    void Logic(App *app);
+    void Draw(App *app);
+};
 
 #endif // Command_H

@@ -1,5 +1,5 @@
-#include "Common.hpp"
-#include "Editor.hpp"
+// #include "Common.hpp"
+#include "App.hpp"
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -11,16 +11,15 @@ int main(void)
     SetTargetFPS(60);
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
-    Editor editor = {0};
-    Editor_Init(&editor);
+    App app;
 
     // Main game loop
-    while (!WindowShouldClose() && !editor.the_end) // Detect window close button or ESC key
+    while (!WindowShouldClose() && !app.the_end) // Detect window close button or ESC key
     {
         //----------------------------------------------------------------------------------
         // Logic
         //----------------------------------------------------------------------------------
-        Editor_Logic(&editor);
+        app.Logic();
         //----------------------------------------------------------------------------------
 
         //----------------------------------------------------------------------------------
@@ -28,7 +27,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-        Editor_Draw(&editor);
+        app.Draw();
 
         EndDrawing();
         //----------------------------------------------------------------------------------
@@ -36,7 +35,7 @@ int main(void)
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    Editor_Close(&editor);
+
     //--------------------------------------------------------------------------------------
     return 0;
 }

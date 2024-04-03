@@ -1,4 +1,5 @@
-#include "Directory.hpp"
+#include "Directory.hpp" 
+#include "TextFile.hpp"
 #include <string>
 #include <algorithm>
 

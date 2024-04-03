@@ -1,18 +1,33 @@
 #ifndef Editor_H
 #define Editor_H
 
-#include "Common.hpp"
 #include "Structs.hpp"
-#include "TextFile.hpp"
 #include "Command.hpp"
-#include "Directory.hpp"
-#include "Cursor.hpp"
 
-void Editor_Init(Editor *editor);
+class Editor
+{
+private:
+public:
+    int screenWidth;
+    int screenHeight;
+    Font font;
+    Camera2D camera;
+    float zoom;
 
-void Editor_Logic(Editor *editor);
-void Editor_Draw(Editor *editor);
+    TextFile currentTextFile;
+    Directories currentDirectory;
 
-void Editor_Close(Editor *editor);
+    Vector2 cursor_pos;
+
+    KeyboardKey key_pressed;
+    char char_pressed;
+
+    Editor_state editor_state;
+
+    Editor();
+    ~Editor();
+    void Logic();
+    void Draw();
+};
 
 #endif // Editor_H

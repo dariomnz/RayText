@@ -1,4 +1,5 @@
 #include "Cursor.hpp"
+#include "Common.hpp"
 #include <string>
 
 using namespace std;

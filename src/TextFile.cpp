@@ -1,4 +1,5 @@
 #include "TextFile.hpp"
+#include "Cursor.hpp"
 #include <string>
 
 using namespace std;
