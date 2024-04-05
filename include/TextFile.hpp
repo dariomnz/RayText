@@ -7,22 +7,43 @@
 #include "raymath.h"
 #include <string>
 
-TextFile TextFile_Load(std::string file_name);
-TextFile TextFile_LoadEmpty(void);
-void TextFile_Free(TextFile *textFile);
-void TextFile_Save(TextFile *textFile);
+class TextFile
+{
+private:
+    void RemoveLine_Left();
+    void RemoveLine_Right();
+    void RemoveChar_Left();
+    void RemoveChar_Right();
 
-void TextFile_Print(TextFile *textFile);
+public:
+    std::vector<std::string> buffer; // vector of strings for store the data;
 
-void TextFile_InsertChar(TextFile *textFile, char c);
-void TextFile_RemoveChar(TextFile *textFile);
-void TextFile_InsertNewLine(TextFile *textFile);
-void TextFile_RemovePreLine(TextFile *textFile);
+    Cursor cursor_start_select;         // Cursor start select
+    std::string cursor_select;          // Cursor select text
+    std::vector<Rectangle> rect_select; // Vector of rects
+    Cursor cursor;                      // Cursor
+    std::string name;                   // Name of file
+    TextFile();
+    ~TextFile();
 
-void TextFile_MoveCursor(TextFile *textFile, KeyboardKey key_pressed);
-Vector2 TextFile_GetCursorPosition(TextFile *textFile, Font font);
+    std::string ToString();
 
-void TextFile_Logic(Editor *editor);
-void TextFile_Draw(Editor *editor);
+    void Load();
+    void Load(std::string file_name);
+    void Save();
+    void Free();
+
+    void Print();
+
+    void InsertChar(char c);
+    void InsertStr(const char *str);
+    void RemoveChar();
+    void InsertNewLine();
+    void RemovePreLine();
+
+    void Logic(Editor &editor);
+    void Draw(Editor &editor);
+    void DrawNoCamera(Editor &editor);
+};
 
 #endif // TextFile_H

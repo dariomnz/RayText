@@ -2,8 +2,9 @@
 #define Editor_H
 
 #include "Structs.hpp"
-#include "Command.hpp"
+#include <memory>
 
+class TextFile;
 class Editor
 {
 private:
@@ -14,7 +15,8 @@ public:
     Camera2D camera;
     float zoom;
 
-    TextFile currentTextFile;
+    std::vector<TextFile> &textFiles;
+    int currentTextFile_index;
     Directories currentDirectory;
 
     Vector2 cursor_pos;
@@ -24,7 +26,9 @@ public:
 
     Editor_state editor_state;
 
-    Editor();
+    TextFile &GetCurrentTextFile();
+
+    Editor(std::vector<TextFile> &ref);
     ~Editor();
     void Logic();
     void Draw();

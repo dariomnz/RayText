@@ -94,8 +94,8 @@ void Directory_Logic(Editor *editor)
         aux += editor->currentDirectory.items[editor->currentDirectory.selected].name;
         if (editor->currentDirectory.items[editor->currentDirectory.selected].is_file)
         {
-            TextFile_Free(&editor->currentTextFile);
-            editor->currentTextFile = TextFile_Load(aux);
+            editor->GetCurrentTextFile().Free();
+            editor->GetCurrentTextFile().Load(aux);
             editor->editor_state = STATE_TEXTFILE;
         }
         else

@@ -3,12 +3,12 @@
 
 #include "Editor.hpp"
 #include "Command.hpp"
+#include "TextFile.hpp"
 
 class App
 {
-private:
-
 public:
+    std::vector<TextFile> textFiles;
     Editor editor;
     Command command;
     bool the_end = false;

@@ -1,5 +1,6 @@
 #include "Cursor.hpp"
 #include "Common.hpp"
+#include "TextFile.hpp"
 #include <string>
 
 using namespace std;
@@ -279,10 +280,10 @@ void Cursor_Logic(Editor *editor)
     }
     else if (editor->editor_state == STATE_TEXTFILE)
     {
-        Cursor_Move(&editor->currentTextFile, editor->font, editor->key_pressed);
-        editor->cursor_pos = Cursor_GetPosition(&editor->currentTextFile, editor->font);
+        Cursor_Move(&editor->GetCurrentTextFile(), editor->font, editor->key_pressed);
+        editor->cursor_pos = Cursor_GetPosition(&editor->GetCurrentTextFile(), editor->font);
 
-        Cursor_CheckClickCursorPosition(&editor->currentTextFile, editor);
+        Cursor_CheckClickCursorPosition(&editor->GetCurrentTextFile(), editor);
     }
 }
 
@@ -300,9 +301,9 @@ void Cursor_Draw(Editor *editor)
         // Draw Cursor
         DrawRectangleV(editor->cursor_pos, (Vector2){2, FONT_SIZE}, WHITE);
         // Draw selected
-        for (size_t i = 0; i < editor->currentTextFile.rect_select.size(); i++)
+        for (size_t i = 0; i < editor->GetCurrentTextFile().rect_select.size(); i++)
         {
-            DrawRectangleRec(editor->currentTextFile.rect_select[i], (Color){100, 100, 100, 100});
+            DrawRectangleRec(editor->GetCurrentTextFile().rect_select[i], (Color){100, 100, 100, 100});
         }
     }
 }

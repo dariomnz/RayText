@@ -15,9 +15,9 @@ public:
     Command();
     ~Command();
 
-    void Consume(App *app);
-    void Logic(App *app);
-    void Draw(App *app);
+    void Consume(App &app);
+    void Logic(App &app);
+    void Draw(App &app);
 };
 
 #endif // Command_H

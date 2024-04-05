@@ -12,9 +12,14 @@ constexpr int keys_to_check[8] = {KEY_RIGHT,
                                   KEY_BACKSPACE,
                                   KEY_DELETE,
                                   KEY_ENTER};
-
-Editor::Editor()
+TextFile &Editor::GetCurrentTextFile()
 {
+    return textFiles[currentTextFile_index];
+}
+
+Editor::Editor(std::vector<TextFile> &ref) : textFiles(ref)
+{
+    DEBUG_MSG("Construct Editor");
     screenWidth = 800;
     screenHeight = 450;
     InitWindow(screenWidth, screenHeight, "RayText");
@@ -25,7 +30,8 @@ Editor::Editor()
 
     font = LoadFontEx("." PATH_SEPARATOR "resources" PATH_SEPARATOR "fonts" PATH_SEPARATOR "Monaco.ttf", 82, 0, 0);
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
-    currentTextFile = TextFile_LoadEmpty();
+    currentTextFile_index = 0;
+    GetCurrentTextFile().Load();
 
     zoom = 1.0f;
     camera.zoom = 1.0f;
@@ -38,7 +44,7 @@ Editor::Editor()
 Editor::~Editor()
 {
     DEBUG_MSG("delete Editor");
-    TextFile_Free(&currentTextFile);
+    // TextFile_Free(&currentTextFile);
     Directory_Free(&currentDirectory);
     // Command_Free(&editor->currentCommand);
     UnloadFont(font);
@@ -64,7 +70,7 @@ void Editor::Logic()
     }
     char_pressed = GetCharPressed();
 
-    TextFile_Logic(this);
+    GetCurrentTextFile().Logic(*this);
     Directory_Logic(this);
     Cursor_Logic(this);
 
@@ -92,11 +98,13 @@ void Editor::Draw()
 
     BeginMode2D(camera);
 
-    TextFile_Draw(this);
+    GetCurrentTextFile().Draw(*this);
     Directory_Draw(this);
     Cursor_Draw(this);
 
     EndMode2D();
+
+    GetCurrentTextFile().DrawNoCamera(*this);
 
     DrawFPS(0, 0);
 }

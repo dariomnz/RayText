@@ -16,17 +16,6 @@ typedef struct Cursor
     size_t position; // Position in line
 } Cursor;
 
-typedef struct TextFile
-{
-    std::vector<std::string> buffer; // vector of strings for store the data;
-
-    Cursor cursor_start_select;         // Cursor start select
-    std::string cursor_select;          // Cursor select text
-    std::vector<Rectangle> rect_select; // Vector of rects
-    Cursor cursor;                      // Cursor
-    std::string name;                   // Name of file
-} TextFile;
-
 typedef struct Directory
 {
     std::string name; // Name
