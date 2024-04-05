@@ -4,8 +4,10 @@
 #include "Common.hpp"
 #include "Structs.hpp"
 #include "Editor.hpp"
+#include "Cursor.hpp"
 #include "raymath.h"
 #include <string>
+
 
 class TextFile
 {
@@ -18,10 +20,10 @@ private:
 public:
     std::vector<std::string> buffer; // vector of strings for store the data;
 
+    Cursor cursor;                      // Cursor
     Cursor cursor_start_select;         // Cursor start select
     std::string cursor_select;          // Cursor select text
     std::vector<Rectangle> rect_select; // Vector of rects
-    Cursor cursor;                      // Cursor
     std::string name;                   // Name of file
     TextFile();
     ~TextFile();

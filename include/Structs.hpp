@@ -10,12 +10,6 @@
 
 // Structs
 
-typedef struct Cursor
-{
-    int line_num;    // Numero de la linea
-    size_t position; // Position in line
-} Cursor;
-
 typedef struct Directory
 {
     std::string name; // Name
@@ -28,12 +22,5 @@ typedef struct Directories
     std::string name;             // Name of dir
     int selected;                 // Selected Directory
 } Directories;
-
-typedef enum
-{
-    STATE_TEXTFILE = 0,
-    STATE_COMMAND = 1,
-    STATE_DIRECTORY = 2
-} Editor_state;
 
 #endif // Structs_H

@@ -36,6 +36,7 @@ Editor::Editor(std::vector<TextFile> &ref) : textFiles(ref)
     zoom = 1.0f;
     camera.zoom = 1.0f;
     camera.offset = (Vector2){(float)screenWidth / 2, (float)screenHeight / 2};
+    camera.rotation = 0.0f;
 
     editor_state = STATE_TEXTFILE;
     cursor_pos = Vector2Zero();
@@ -72,7 +73,7 @@ void Editor::Logic()
 
     GetCurrentTextFile().Logic(*this);
     Directory_Logic(this);
-    Cursor_Logic(this);
+    GetCurrentTextFile().cursor.Logic(*this);
 
     // Zoom based on mouse wheel
     float wheel = GetMouseWheelMove();
@@ -100,7 +101,7 @@ void Editor::Draw()
 
     GetCurrentTextFile().Draw(*this);
     Directory_Draw(this);
-    Cursor_Draw(this);
+    GetCurrentTextFile().cursor.Draw(*this);
 
     EndMode2D();
 

@@ -5,6 +5,14 @@
 #include <memory>
 
 class TextFile;
+
+typedef enum
+{
+    STATE_TEXTFILE = 0,
+    STATE_COMMAND = 1,
+    STATE_DIRECTORY = 2
+} Editor_state;
+
 class Editor
 {
 private:

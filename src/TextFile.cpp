@@ -47,7 +47,7 @@ void TextFile::Load(std::string file_name)
     cursor_start_select.line_num = -1;
 }
 
-TextFile::TextFile()
+TextFile::TextFile() : cursor(*this), cursor_start_select(*this)
 {
     DEBUG_MSG("Contructor TextFile");
     Load();
@@ -94,7 +94,7 @@ void TextFile::Print()
 
 void TextFile::InsertChar(char c)
 {
-    Cursor_GetLine(this, &cursor).insert(cursor.position, 1, c);
+    cursor.GetLine().insert(cursor.position, 1, c);
     cursor.position++;
 }
 
@@ -109,32 +109,32 @@ void TextFile::InsertStr(const char *str)
         if (str[i] == '\n')
         {
             size = i - start - 1;
-            Cursor_GetLine(this, &cursor).insert(cursor.position, &str[start], size);
+            cursor.GetLine().insert(cursor.position, &str[start], size);
             cursor.position += size;
             InsertNewLine();
             start = i + 1;
         }
     }
     size = i - start;
-    Cursor_GetLine(this, &cursor).insert(cursor.position, &str[start], size);
+    cursor.GetLine().insert(cursor.position, &str[start], size);
     cursor.position += size;
 }
 
 void TextFile::InsertNewLine()
 {
     size_t new_line_pos = cursor.line_num + 1;
-    size_t new_line_chars = Cursor_GetLine(this, &cursor).size() - cursor.position;
+    size_t new_line_chars = cursor.GetLine().size() - cursor.position;
 
     // Build new line
     string new_line;
 
-    new_line.insert(0, Cursor_GetLine(this, &cursor), cursor.position, new_line_chars);
+    new_line.insert(0, cursor.GetLine(), cursor.position, new_line_chars);
     buffer.insert(buffer.begin() + new_line_pos, new_line);
 
     // Add return of line
-    if (cursor.position != Cursor_GetLine(this, &cursor).size())
+    if (cursor.position != cursor.GetLine().size())
     {
-        string &line = Cursor_GetLine(this, &cursor);
+        string &line = cursor.GetLine();
         line = line.substr(0, cursor.position);
     }
 
@@ -150,7 +150,7 @@ void TextFile::RemoveLine_Left()
 
     size_t position_pre_line = buffer[cursor.line_num - 1].size();
 
-    buffer[cursor.line_num - 1] += Cursor_GetLine(this, &cursor);
+    buffer[cursor.line_num - 1] += cursor.GetLine();
     buffer.erase(buffer.begin() + cursor.line_num);
 
     // Update cursor
@@ -163,7 +163,7 @@ void TextFile::RemoveLine_Right()
     if (cursor.line_num + 1 == (int)buffer.size())
         return;
 
-    Cursor_GetLine(this, &cursor) += buffer[cursor.line_num + 1];
+    cursor.GetLine() += buffer[cursor.line_num + 1];
     buffer.erase(buffer.begin() + cursor.line_num + 1);
 }
 
@@ -175,7 +175,7 @@ void TextFile::RemoveChar_Left()
         RemoveLine_Left();
         return;
     }
-    string &line = Cursor_GetLine(this, &cursor);
+    string &line = cursor.GetLine();
     line.erase(line.begin() + cursor_pos - 1);
 
     // Update cursor
@@ -185,13 +185,13 @@ void TextFile::RemoveChar_Left()
 void TextFile::RemoveChar_Right()
 {
     size_t cursor_pos = cursor.position;
-    if (cursor_pos == Cursor_GetLine(this, &cursor).size())
+    if (cursor_pos == cursor.GetLine().size())
     {
         RemoveLine_Right();
         return;
     }
 
-    string &line = Cursor_GetLine(this, &cursor);
+    string &line = cursor.GetLine();
     line.erase(line.begin() + cursor_pos);
 }
 
