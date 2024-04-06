@@ -1,10 +1,7 @@
 #ifndef Editor_H
 #define Editor_H
 
-#include "Structs.hpp"
-#include <memory>
-
-class TextFile;
+#include "Common.hpp"
 
 typedef enum
 {
@@ -12,6 +9,9 @@ typedef enum
     STATE_COMMAND = 1,
     STATE_DIRECTORY = 2
 } Editor_state;
+
+class Directories;
+class TextFile;
 
 class Editor
 {
@@ -25,7 +25,7 @@ public:
 
     std::vector<TextFile> &textFiles;
     int currentTextFile_index;
-    Directories currentDirectory;
+    Directories &currentDirectory;
 
     Vector2 cursor_pos;
 
@@ -36,7 +36,7 @@ public:
 
     TextFile &GetCurrentTextFile();
 
-    Editor(std::vector<TextFile> &ref);
+    Editor(std::vector<TextFile> &ref, Directories &directories);
     ~Editor();
     void Logic();
     void Draw();

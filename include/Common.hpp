@@ -7,6 +7,8 @@
 #include "raylib.h"
 #include "raymath.h"
 #include <iostream>
+#include <vector>
+#include <string>
 
 #ifdef _WIN32
 #define PATH_SEPARATOR "\\"

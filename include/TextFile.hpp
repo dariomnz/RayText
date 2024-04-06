@@ -2,12 +2,9 @@
 #define TextFile_H
 
 #include "Common.hpp"
-#include "Structs.hpp"
-#include "Editor.hpp"
 #include "Cursor.hpp"
-#include "raymath.h"
-#include <string>
 
+class Editor;
 
 class TextFile
 {

@@ -1,5 +1,5 @@
 #include "Command.hpp"
-#include "Directory.hpp"
+#include "Directories.hpp"
 #include "TextFile.hpp"
 #include "App.hpp"
 #include <ctype.h>
@@ -66,7 +66,7 @@ void Command::Consume(App &app)
             string aux = command.substr(4);
             trimwhitespace(aux);
             DEBUG_MSG(">dir Name of dir:" << aux);
-            Directory_Load(&app.editor.currentDirectory, aux);
+            app.directories.Load(aux);
             app.editor.editor_state = STATE_DIRECTORY;
         }
     }

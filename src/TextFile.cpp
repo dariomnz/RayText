@@ -1,5 +1,6 @@
 #include "TextFile.hpp"
 #include "Cursor.hpp"
+#include "Editor.hpp"
 #include <string>
 
 using namespace std;

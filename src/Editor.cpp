@@ -2,7 +2,7 @@
 #include "Command.hpp"
 #include "Cursor.hpp"
 #include "TextFile.hpp"
-#include "Directory.hpp"
+#include "Directories.hpp"
 
 constexpr int keys_to_check[8] = {KEY_RIGHT,
                                   KEY_LEFT,
@@ -17,7 +17,7 @@ TextFile &Editor::GetCurrentTextFile()
     return textFiles[currentTextFile_index];
 }
 
-Editor::Editor(std::vector<TextFile> &ref) : textFiles(ref)
+Editor::Editor(std::vector<TextFile> &ref, Directories &directories) : textFiles(ref), currentDirectory(directories)
 {
     DEBUG_MSG("Construct Editor");
     screenWidth = 800;
@@ -45,7 +45,6 @@ Editor::Editor(std::vector<TextFile> &ref) : textFiles(ref)
 Editor::~Editor()
 {
     DEBUG_MSG("delete Editor");
-    Directory_Free(&currentDirectory);
     UnloadFont(font);
 
     CloseWindow(); // Close window and OpenGL context
@@ -70,7 +69,7 @@ void Editor::Logic()
     char_pressed = GetCharPressed();
 
     GetCurrentTextFile().Logic(*this);
-    Directory_Logic(this);
+    currentDirectory.Logic(*this);
     GetCurrentTextFile().cursor.Logic(*this);
 
     // Zoom based on mouse wheel
@@ -98,7 +97,7 @@ void Editor::Draw()
     BeginMode2D(camera);
 
     GetCurrentTextFile().Draw(*this);
-    Directory_Draw(this);
+    currentDirectory.Draw(*this);
     GetCurrentTextFile().cursor.Draw(*this);
 
     EndMode2D();

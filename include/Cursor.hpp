@@ -1,12 +1,10 @@
 #ifndef Cursor_H
 #define Cursor_H
 
-#include "Structs.hpp"
-#include "Editor.hpp"
-#include "raymath.h"
-#include <string>
+#include "Common.hpp"
 
 class TextFile;
+class Editor;
 class Cursor
 {
 private:

@@ -3,7 +3,6 @@
 
 #include "Common.hpp"
 #include <string>
-
 class App;
 
 class Command

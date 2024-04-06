@@ -1,6 +1,6 @@
 #include "App.hpp"
 
-App::App() : textFiles(1), editor(textFiles), command()
+App::App() : textFiles(1), editor(textFiles, directories), command()
 {
     DEBUG_MSG("Construct App");
 }

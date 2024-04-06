@@ -1,5 +1,7 @@
 #include "Cursor.hpp"
 #include "Common.hpp"
+#include "Editor.hpp"
+#include "Directories.hpp"
 #include "TextFile.hpp"
 #include <string>
 
