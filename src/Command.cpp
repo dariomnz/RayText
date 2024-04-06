@@ -25,14 +25,14 @@ bool strstart(char *str1, char *str2)
     return true;
 }
 
-void trimwhitespace(string *str)
+void trimwhitespace(string &str)
 {
     // Trim leading space
-    while (str->front() == ' ')
-        str->erase(0);
+    while (str.front() == ' ')
+        str.erase(0, 1);
     // Trim trailing space
-    while (str->back() == ' ')
-        str->pop_back();
+    while (str.back() == ' ')
+        str.pop_back();
 }
 
 Command::Command()
@@ -61,11 +61,11 @@ void Command::Consume(App &app)
             DEBUG(">exit");
             app.the_end = true;
         }
-        else if (command.compare(">dir"))
+        else if (command.compare(">dir") == 0)
         {
             string aux = command.substr(4);
-            trimwhitespace(&aux);
-            DEBUG_MSG(">dir Name of dir: %s" << aux);
+            trimwhitespace(aux);
+            DEBUG_MSG(">dir Name of dir:" << aux);
             Directory_Load(&app.editor.currentDirectory, aux);
             app.editor.editor_state = STATE_DIRECTORY;
         }
@@ -91,11 +91,16 @@ void Command::Consume(App &app)
 
 void Command::Logic(App &app)
 {
-    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_P))
-        app.editor.editor_state = STATE_COMMAND;
-
     if (app.editor.editor_state != STATE_COMMAND)
+    {
+        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_P))
+        {
+            if (IsKeyDown(KEY_LEFT_SHIFT))
+                command += ">";
+            app.editor.editor_state = STATE_COMMAND;
+        }
         return;
+    }
 
     if (app.editor.key_pressed == KEY_BACKSPACE)
         command.pop_back();

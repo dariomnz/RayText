@@ -38,7 +38,7 @@ public:
     void Print();
 
     void InsertChar(char c);
-    void InsertStr(const char *str);
+    void InsertStr(std::string str);
     void RemoveChar();
     void InsertNewLine();
     void RemovePreLine();

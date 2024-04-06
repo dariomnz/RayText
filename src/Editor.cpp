@@ -45,9 +45,7 @@ Editor::Editor(std::vector<TextFile> &ref) : textFiles(ref)
 Editor::~Editor()
 {
     DEBUG_MSG("delete Editor");
-    // TextFile_Free(&currentTextFile);
     Directory_Free(&currentDirectory);
-    // Command_Free(&editor->currentCommand);
     UnloadFont(font);
 
     CloseWindow(); // Close window and OpenGL context

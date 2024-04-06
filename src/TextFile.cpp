@@ -98,26 +98,25 @@ void TextFile::InsertChar(char c)
     cursor.position++;
 }
 
-void TextFile::InsertStr(const char *str)
+void TextFile::InsertStr(string str)
 {
-    size_t str_size = strlen(str);
-    size_t start = 0;
-    size_t size = 0;
-    size_t i;
-    for (i = 0; i < str_size; i++)
+    size_t pos = 0, last_pos = 0;
+    string aux;
+    while (pos < str.size())
     {
-        if (str[i] == '\n')
-        {
-            size = i - start - 1;
-            cursor.GetLine().insert(cursor.position, &str[start], size);
-            cursor.position += size;
-            InsertNewLine();
-            start = i + 1;
-        }
+        pos = str.find('\n', last_pos);
+        if (pos > str.size())
+            continue;
+        aux = str.substr(last_pos, pos - last_pos - 1);
+        cursor.GetLine().insert(cursor.position, aux);
+        cursor.position += aux.size();
+        InsertNewLine();
+        last_pos = pos + 1;
     }
-    size = i - start;
-    cursor.GetLine().insert(cursor.position, &str[start], size);
-    cursor.position += size;
+    aux = str.substr(last_pos, str.size() - last_pos);
+    DEBUG_MSG(aux);
+    cursor.GetLine().insert(cursor.position, aux);
+    cursor.position += aux.size();
 }
 
 void TextFile::InsertNewLine()
@@ -247,7 +246,7 @@ void TextFile::Draw(Editor &editor)
     int plus_minus_lines = (editor.screenHeight / editor.camera.zoom) / FONT_SIZE / 2 * 1.5f;
     int current_line = editor.GetCurrentTextFile().cursor.line_num;
     int i;
-    char str_line_number[10];
+    string str_line_number;
     Vector2 str_line_number_size;
     for (i = current_line - plus_minus_lines; i < current_line + plus_minus_lines; i++)
     {
@@ -258,9 +257,9 @@ void TextFile::Draw(Editor &editor)
         // Draw text
         DrawTextEx(editor.font, editor.GetCurrentTextFile().buffer[i].c_str(), (Vector2){0, (float)FONT_SIZE * i}, FONT_SIZE, FONT_SPACING, WHITE);
         // Draw line number
-        sprintf(str_line_number, "%d ", i + 1);
-        str_line_number_size = MeasureTextEx(editor.font, str_line_number, FONT_SIZE, FONT_SPACING);
-        DrawTextEx(editor.font, str_line_number, (Vector2){-str_line_number_size.x, (float)FONT_SIZE * i}, FONT_SIZE, FONT_SPACING, GRAY);
+        str_line_number = to_string(i + 1) + " ";
+        str_line_number_size = MeasureTextEx(editor.font, str_line_number.c_str(), FONT_SIZE, FONT_SPACING);
+        DrawTextEx(editor.font, str_line_number.c_str(), (Vector2){-str_line_number_size.x, (float)FONT_SIZE * i}, FONT_SIZE, FONT_SPACING, GRAY);
     }
     // Draw line separator numbers
     int final_num_pos = FONT_SIZE * i;
@@ -271,7 +270,7 @@ void TextFile::DrawNoCamera(Editor &editor)
 {
     string text = "Ln " + to_string(cursor.line_num + 1) + ", Col " + to_string(cursor.position + 1);
     const char *c_text = text.c_str();
-    int mult = 5;
+    int mult = 2;
     Vector2 text_size = MeasureTextEx(editor.font, c_text, FONT_SIZE / mult, FONT_SPACING);
-    DrawText(c_text, editor.screenWidth - text_size.x * mult, editor.screenHeight - text_size.y * mult, FONT_SIZE / mult, RAYWHITE);
+    DrawText(c_text, editor.screenWidth - text_size.x, editor.screenHeight - text_size.y, FONT_SIZE / mult, RAYWHITE);
 }
